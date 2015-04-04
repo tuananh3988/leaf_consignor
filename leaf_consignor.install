@@ -1,0 +1,190 @@
+<?php
+function leaf_consignor_schema() {
+    $schema = array();
+    $schema['leaf_contract'] = array(
+      'description' => 'TODO: please describe this table!',
+      'fields' => array(
+        'contract_id' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'serial',
+          'not null' => TRUE,
+        ),
+        'contract_uuid' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'varchar',
+          'length' => '16',
+          'not null' => TRUE,
+          'default' => '0',
+        ),
+        'vendor_id' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'int',
+          'not null' => TRUE,
+        ),
+        'user_id' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'int',
+          'not null' => TRUE,
+        ),
+        'shop_store_id' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'int',
+          'not null' => TRUE,
+        ),
+        'from_date' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'int',
+          'not null' => TRUE,
+        ),
+        'close_date' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'int',
+          'not null' => TRUE,
+        ),
+        'vendor_category' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'varchar',
+          'length' => '255',
+          'not null' => FALSE,
+        ),
+        'revenue_sharing' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'varchar',
+          'length' => '255',
+          'not null' => TRUE,
+        ),
+        'offer_price' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'varchar',
+          'length' => '255',
+          'not null' => FALSE,
+        ),
+        'number_items_off' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'varchar',
+          'length' => '255',
+          'not null' => FALSE,
+        ),
+        'number_items_accepeted' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'varchar',
+          'length' => '255',
+          'not null' => FALSE,
+        ),
+        'number_items_rejected' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'varchar',
+          'length' => '255',
+          'not null' => FALSE,
+        ),
+        'delete_flag' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'int',
+          'length' => '1',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'created_date' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        
+      ),
+      'primary key' => array('contract_id'),
+    );
+    
+    $schema['leaf_vendor'] = array(
+        'description' => 'TODO: please describe this table!',
+        'fields' => array(
+          'vendor_id' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'serial',
+            'not null' => TRUE,
+          ),
+          'vendor_uuid' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '16',
+            'not null' => TRUE,
+            'default' => '0',
+          ),
+          'name' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '255',
+            'not null' => TRUE,
+          ),
+          'address' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '255',
+            'not null' => TRUE,
+          ),
+          'city' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '255',
+            'not null' => TRUE,
+          ),
+          'state' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '255',
+            'not null' => TRUE,
+          ),
+          'zip' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '10',
+            'not null' => TRUE,
+          ),
+          'email_address' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '255',
+            'not null' => TRUE,
+          ),
+          'phone_number' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '30',
+            'not null' => TRUE,
+          ),
+          'alternate_phone_number' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'varchar',
+            'length' => '30',
+            'not null' => TRUE,
+          ),
+          'payment_id' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'int',
+            'not null' => TRUE,
+          ),
+          'user_id' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'int',
+            'not null' => TRUE,
+          ),
+         'delete_flag' => array(
+          'description' => 'TODO: please describe this field!',
+          'type' => 'int',
+          'length' => '1',
+          'not null' => TRUE,
+          'default' => 0,
+          ),
+          'created_date' => array(
+            'description' => 'TODO: please describe this field!',
+            'type' => 'int',
+            'not null' => TRUE,
+            'default' => 0,
+          ),
+        ),
+        'primary key' => array('vendor_id'),
+      );
+
+
+    return $schema;
+}

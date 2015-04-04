@@ -1,0 +1,105 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Feb 7, 2015, 6:01:50 PM
+    Author     : Doreman
+*/
+
+
+/* consignor page */
+
+
+#product-fieldset-wrapper .form-item.form-type-textfield {
+	width: 10%;
+	float: left;
+}
+
+#product-fieldset-wrapper .form-item {
+	width: 7%;
+	float: left;
+	margin-bottom: 0;
+}
+
+#product-fieldset-wrapper .form-item label {
+	height: 25px;
+}
+#product-fieldset-wrapper .form-item.form-type-select select {
+	margin-top: 2px;
+}
+
+.product-fiedset {
+	border: none;
+}
+#product-fieldset-wrapper {
+	margin-bottom: 30px;
+}
+#product-fieldset-wrapper fieldset {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0px;
+}
+
+#product-fieldset-wrapper fieldset .fieldset-wrapper {
+  margin-top: 3px;
+}
+
+#zone-content #product-fieldset-wrapper .form-submit {
+	margin-top: 20px;
+}
+
+.contract-fieldset select.form-select {
+    padding-right: 10px;
+}
+
+#product-fieldset-wrapper .form-item .brand_list {
+	width: 62px;
+}
+
+
+.ajaxview_vendor{
+            width:930px;
+            margin:0 auto; 
+            width:100%; 
+            border-collapse: collapse;
+            border:1px solid gray;
+        }
+        .ajaxview_vendor label{
+            display: block;
+            width: 190px;    
+            float:left;
+        }
+        .ajaxview_vendor span{
+            display: block;
+            float:left;
+            width:auto;
+        }
+        table.ajaxview_vendor td,table.ajaxview_vendor th{
+            border: 1px solid gray;
+            padding:5px;
+        }
+        h2{
+            margin:5px 0px 5px;
+            padding:0;
+        }
+        .contract_information{
+            font-size: 14px;
+            width:100%;
+        }
+        .row{
+            clear:both;
+            float:left;
+            width:100%;
+        }
+        .contract_information label,.contract_information span,.inventory_information label,.inventory_information span,
+        .vendor_information label,.vendor_information span{
+            display: block;
+            float: left;
+            width:130px;
+        }
+        .vendor_information{
+            float:right;
+            text-align: left;
+        }

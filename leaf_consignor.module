@@ -1,0 +1,397 @@
+<?php
+
+function leaf_consignor_menu() {
+    $items = array();
+    $items['consignor'] = array(
+        'title' => 'Consignor/Vendor',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('form_collection_consignor'),
+        //'access callback' => TRUE,
+        //'description' => 'A set of ten tutorials',
+        'file' => 'leaf_consignor.inc',
+        'type' => MENU_LOCAL_TASK,
+        'access arguments' => array('access_leaf_consignor_content'),
+    );
+
+    $items['contract'] = array(
+        'title' => 'New Contract',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('form_collection_contract'),
+        // 'access callback' => TRUE,
+        //'description' => 'A set of ten tutorials',
+        'file' => 'leaf_consignor.inc',
+        'type' => MENU_LOCAL_TASK,
+        'access arguments' => array('access_leaf_consignor_content'),
+    );
+
+    $items['contract/summary/%contract'] = array(
+        'title' => 'Summary Contract / Vendor Report',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('contract_summary_form', 2),
+        'access arguments' => array('access_leaf_consignor_content'),
+        'type' => MENU_LOCAL_TASK,
+    );
+
+    $items['vendor/%vendor/edit'] = array(
+        'title' => 'Summary Contract / Vendor Report',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('vendor_edit_form', 1),
+        'access arguments' => array('access_leaf_consignor_content'),
+        'file' => 'leaf_consignor.inc',
+        'type' => MENU_LOCAL_TASK,
+    );
+
+    return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function leaf_consignor_permission() {
+    return array(
+        'access_leaf_consignor_content' => array(
+            'title' => t('Access content for the Leaf Consignor'),
+        )
+    );
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Defines the theming capabilities provided by this module.
+ */
+function leaf_consignor_theme() {
+    return array(
+        'contract_summary_form' => array(
+            'render element' => 'form',
+            'template' => 'theming-contract-summary-form',
+        ),
+    );
+}
+
+function vendor_edit_form($form, &$form_state, $vendor) {
+    $form = form_new_vendor();
+
+    $form['new_1422973868224']['#title'] = 'Edit Vendor';
+    $form['new_1422973868224']['new_1422973901058']['#default_value'] = $vendor['name'];
+    $form['new_1422973868224']['new_1422973944836']['#default_value'] = $vendor['address'];
+    $form['new_1422973868224']['new_1422973972442']['#default_value'] = $vendor['city'];
+    $form['new_1422973868224']['new_1422974065842']['#default_value'] = $vendor['state'];
+    $form['new_1422973868224']['new_1422974068093']['#default_value'] = $vendor['zip'];
+    $form['new_1422973868224']['new_1422974070252']['#default_value'] = $vendor['email_address'];
+    $form['new_1422973868224']['new_1422974138424']['#default_value'] = $vendor['phone_number'];
+    $form['new_1422973868224']['new_1422974164604']['#default_value'] = $vendor['alternate_phone_number'];
+    $form['new_1422973868224']['new_1422974198240']['#default_value'] = $vendor['payment_id'];
+    $form['new_1422973868224']['new_1422974198239'] = array(
+        '#type' => 'hidden',
+        '#value' => $vendor['vendor_id'],
+    );
+
+
+    $form['back'] = array(
+        '#type' => 'submit',
+        '#value' => t('Back'),
+    );
+
+    $form['reset'] = array(
+        '#type' => 'submit',
+        '#value' => t('Reset'),
+    );
+
+    $form['delete'] = array(
+        '#type' => 'submit',
+        '#value' => t('Delete Vendor'),
+    );
+
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Save'),
+    );
+
+    $form['create'] = array(
+        '#type' => 'submit',
+        '#value' => t('Save and Create new consignment contract'),
+    );
+
+
+
+    return $form;
+}
+
+function vendor_edit_form_submit($form, &$form_state) {
+    $v = $form_state['values'];
+
+    if ($v['op'] == 'Save' || $v['op'] == 'Save and Create new consignment contract') {
+        db_update('leaf_vendor')
+                ->fields(array(
+                    'name' => $v['new_1422973901058'],
+                    'address' => $v['new_1422973944836'],
+                    'city' => $v['new_1422973972442'],
+                    'state' => $v['new_1422974065842'],
+                    'zip' => $v['new_1422974068093'],
+                    'email_address' => $v['new_1422974070252'],
+                    'phone_number' => $v['new_1422974138424'],
+                    'alternate_phone_number' => $v['new_1422974164604'],
+                    'payment_id' => $v['new_1422974198240'],
+                ))
+                ->condition('vendor_id', $v['new_1422974198239'], '=')
+                ->execute();
+
+        if ($v['op'] == 'Save and Create new consignment contract') {
+            drupal_goto('contract/' . $v['new_1422974198239']);
+        }
+    }
+
+    if ($v['op'] == 'Delete Vendor') {
+        db_update('leaf_vendor')
+                ->fields(array(
+                    'delete_flag' => 1,
+                ))
+                ->condition('vendor_id', $v['new_1422974198239'], '=')
+                ->execute();
+
+        drupal_goto('vendor/list');
+    }
+
+    if ($v['op'] == 'Back') {
+        drupal_goto('vendor/list');
+    }
+}
+
+function contract_summary_form($form, &$form_state, $contract) {
+
+    $products = getProduct($contract['contract_id']);
+
+    $active = array(0 => t('As is'), 1 => t('Cash offer'));
+
+    $form['emailconsignment'] = array(
+        '#type' => 'radios',
+        '#title' => t('Email Consignment '),
+        '#default_value' => isset($form_state['input']['emailconsignment']) ? $form_state['input']['emailconsignment'] : 0,
+        '#options' => $active,
+        '#attributes' => ['class' => ['email_consignment_input']],
+    );
+
+    foreach ($products as $k => $v) {
+        $form["cop-{$v->product_id}"] = array(
+            '#weight' => $k,
+            '#required' => '0',
+            '#type' => 'textfield',
+            '#size' => 7,
+            '#default_value' => $v->cop,
+        );
+    }
+
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Save'),
+    );
+
+    $form['#contract'] = $contract;
+
+    return $form;
+}
+
+function contract_summary_form_submit($form, &$form_state) {
+    foreach ($form_state['values'] as $k => $v) {
+        $f = explode('-', $k);
+        if ($f[0] == 'cop') {
+            db_update('leaf_product')
+                    ->fields(array(
+                        'cop' => $v,
+                    ))
+                    ->condition('product_id', $f[1], '=')
+                    ->execute();
+        }
+    }
+
+    unset($form['emailconsignment']);
+    unset($form['submit']);
+    $form['email_type'] = $form_state['values']['emailconsignment'];
+    $params = array(
+        'body' => render($form),
+        'subject' => 'GREENE STREET WEB CONTRACT #' . $form['#contract']['contract_uuid'],
+        'headers' => 'simple',
+    );
+
+    $vendor = vendor_load($form['#contract']['vendor_id']);
+    $module = 'leaf_consignor';
+    $key = 'summary';
+    $message = drupal_mail($module, $key, $vendor['email_address'], language_default(), $params);
+}
+
+/**
+ * Implements hook_mail().
+ */
+function leaf_consignor_mail($key, &$message, $params) {
+    $message['subject'] = $params['subject'];
+}
+
+function template_preprocess_contract_summary_form(&$variables) {
+    foreach (element_children($variables['form']) as $key) {
+        if (isset($variables['form'][$key]['#type'])) {
+            $type = $variables['form'][$key]['#type'];
+            if ($type == 'hidden' || $type == 'token') {
+                $text_form_hidden[] = drupal_render($variables['form'][$key]);
+            }
+        }
+    }
+
+    $variables['form']['hidden'] = implode($text_form_hidden);
+
+    $variables['contract'] = $variables['form']['#contract'];
+
+    $vendor = db_select('leaf_vendor', 'v')
+            ->fields('v')
+            ->condition('v.vendor_id', $variables['contract']['vendor_id'], '=')
+            ->execute()
+            ->fetchAssoc();
+
+    $payment = db_select('leaf_payment', 'p')
+            ->fields('p')
+            ->condition('p.id', $vendor['payment_id'], '=')
+            ->execute()
+            ->fetchAssoc();
+
+    $vendor['payment_name'] = $payment['name'];
+    $variables['vendor'] = $vendor;
+    $variables['products'] = getProduct($variables['contract']['contract_id']);
+    $variables['productsCount'] = getProduct($variables['contract']['contract_id'], TRUE);
+    ;
+}
+
+function contract_load($id) {
+    $contract = db_select('leaf_contract', 'c')
+            ->fields('c')
+            ->condition('c.contract_id', $id, '=')
+            ->execute()
+            ->fetchAssoc();
+
+    return $contract;
+}
+
+function vendor_load($id) {
+    $vendor = db_select('leaf_vendor', 'v')
+            ->fields('v')
+            ->condition('v.vendor_id', $id, '=')
+            ->execute()
+            ->fetchAssoc();
+
+    return $vendor;
+}
+
+function getProduct($contractId, $count = false) {
+    $query = db_select('leaf_product', 'p');
+    $query->join('leaf_item_category', 'i', 'i.id = p.item_category_id');
+    $query->join('leaf_color', 'c', 'c.id = p.color_id');
+    $query->join('leaf_brand', 'b', 'b.brand_id = p.brand_id');
+    $query->fields('p', ['product_id', 'sku', 'name', 'size', 'description', 'consignment_price', 'purchase_price', 'price', 'status', 'quantity', 'cop'])
+            ->fields('i', ['name'])
+            ->fields('c', ['name'])
+            ->fields('b', ['brand_name'])
+            ->condition('p.contract_id', $contractId, '=');
+    if ($count) {
+        return $query->countQuery()->execute()->fetchField();
+        ;
+    } else {
+        return $query->execute();
+    }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function leaf_consignor_views_api() {
+    return array(
+        'api' => 3,
+        'path' => drupal_get_path('module', 'leaf_consignor'),
+    );
+}
+
+function leaf_consignor_action_info() {
+    return array(
+        'leaf_consignor_delete_action' => array(
+            'type' => 'entity',
+            'label' => t('Delete Contract'),
+            'configurable' => FALSE,
+            'pass rows' => TRUE, //this will ensure that the entire views row is passed as part of the context in your action callback.
+            'triggers' => array('any'),
+        ),
+        'leaf_consignor_delete_vendor_action' => array(
+            'type' => 'entity',
+            'label' => t('Delete Vendor'),
+            'configurable' => FALSE,
+            'pass rows' => TRUE, //this will ensure that the entire views row is passed as part of the context in your action callback.
+            'triggers' => array('any'),
+        ),
+    );
+}
+
+function leaf_consignor_delete_action($cmt, $context = array()) {
+    db_update('leaf_contract')
+            ->fields(array(
+                'delete_flag' => 1,
+            ))
+            ->condition('contract_id', $cmt->contract_id, '=')
+            ->execute();
+}
+
+function leaf_consignor_delete_vendor_action($cmt, $context = array()) {
+    db_update('leaf_vendor')
+            ->fields(array(
+                'delete_flag' => 1,
+            ))
+            ->condition('vendor_id', $cmt->vendor_id, '=')
+            ->execute();
+}
+
+function leaf_consignor_entity_info() {
+    return array(
+        'leaf_contract' => array(
+            'label' => 'Contract entity item',
+            'base table' => 'leaf_contract',
+            'load hook' => 'contract_load',
+            'entity keys' => array(
+                'id' => 'contract_id',
+                'label' => 'Contract new entity item',
+            ),
+        ),
+        'leaf_vendor' => array(
+            'label' => 'Vendor entity item',
+            'base table' => 'leaf_vendor',
+            'load hook' => 'vendor_load',
+            'entity keys' => array(
+                'id' => 'vendor_id',
+                'label' => 'Vendor new entity item',
+            ),
+        ),
+    );
+}
+
+function leaf_consignor_views_bulk_operations_form_alter(&$form, &$form_state, $vbo) {
+
+    if ($form_state['step'] == 'views_bulk_operations_confirm_form' && in_array($vbo->view->base_table, ['leaf_vendor', 'leaf_contract'])) {
+        $str = '';
+        $countItem = 0;
+        foreach ($vbo->view->result as $k => $row) {
+            if ($vbo->view->base_table == 'leaf_vendor') {
+                $v = $row->leaf_vendor_vendor_uuid;
+            }
+
+            if ($vbo->view->base_table == 'leaf_contract') {
+                $v = $row->leaf_contract_contract_uuid;
+            }
+
+            if ($form_state['values']['views_bulk_operations'][$k] != 0) {
+                $str .= '<li>#' . $v . '</li>';
+                $countItem ++;
+            }
+        }
+
+        $head = '<div class="item-list"><h3>You selected the following <strong>' . $countItem . ' items</strong>:</h3><ul>';
+
+        $str = $head . $str . '</ul></div>';
+
+        $form['description']['#markup'] = $str;
+    }
+}

@@ -143,10 +143,12 @@ function save_contract_products($form_state, $vendorId = null) {
         $vendorId = $contract['new_1423064090214'];
     }
     //add to table contract
+    $closeDate = strtotime($contract['new_142297464756']['year'] . '-' . $contract['new_142297464756']['month'] . '-' . $contract['new_142297464756']['day']);
     $contractId = db_insert('leaf_contract') // Table name no longer needs {}
             ->fields(array(
                 'from_date' => strtotime($contract['new_1422974647565']['year'] . '-' . $contract['new_1422974647565']['month'] . '-' . $contract['new_1422974647565']['day']),
-                'close_date' => strtotime($contract['new_142297464756']['year'] . '-' . $contract['new_142297464756']['month'] . '-' . $contract['new_142297464756']['day']),
+                'close_date' => $closeDate,
+                'claim_date' => $closeDate + 24 * 60 * 60,
                 'vendor_id' => $vendorId,
                 'vendor_category' => $contract['new_1422974647564'],
                 'revenue_sharing' => $contract['new_1422974650384'],
@@ -381,7 +383,7 @@ function form_new_contract($vendor = false) {
         '#weight' => '1',
         '#required' => '1',
         '#type' => 'date',
-        '#default_value' => ['year' => date('Y'), 'month' => date('n', strtotime("+2 month")), 'day' => date('d')],
+        '#default_value' => ['year' => date('Y'), 'month' => date('n', strtotime("+2 month")), 'day' => date('j')],
         '#title' => t('Close date'),
     );
     $form['new_1422974499389']['new_1422974647567'] = array(

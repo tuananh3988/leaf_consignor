@@ -1,26 +1,4 @@
-<?= ($form['hidden']); ?>
 <div id="page:main-container">
-    <div id="messages"></div>   
-        <div style="position: relative;;">
-            <h2>Contract ID : #<?= $contract['contract_uuid']; ?> </h2>
-            <em style="clear:both;float:left;padding-bottom: 10px;">Max-Date: <?= date('m-d-Y'); ?></em>
-
-            <div style="float: right;position:absolute;right:10px;top:-21px;font-size:15px;">
-                <?= drupal_render($form["emailconsignment"]); ?>
-                <!--
-                <table>
-                    <tbody><tr>
-                            <td>Email Consignment&nbsp;</td>
-                            <td rowspan="2"></td>
-                            <td><input checked="checked" class="email_consignment_input" type="radio" name="emailconsignment_option" id="emailconsignment_option_asis" value="as_is">&nbsp;<label for="email_consignment_asis">As is</label></td>
-                            <td><input class="email_consignment_input" type="radio" name="emailconsignment_option" id="emailconsignment_option_cashoffer" value="cash_offer">&nbsp;<label for="email_consignment_cashoffer">Cash offer</label></td>
-                            
-                        </tr>
-                    </tbody></table>
-                -->
-            </div>
-        </div>
-
         <table style="width: 100%;clear:both;">
             <tbody><tr>
                     <td style="width: 30%;text-align: left;font-size:14px;"><strong><?= date('m-d-Y'); ?></strong>
@@ -31,7 +9,7 @@
                             </div> 
                             <div class="row">
                                 <label>Claim Date</label>
-                                <span><?= date('m-d-Y', ($contract['claim_date'])); ?></span>
+                                <span><?= date('m-d-Y', ($contract['close_date'])); ?></span>
                             </div> 
                             <div class="row">
                                 <label>Total Items</label>
@@ -67,7 +45,7 @@
                             </div>        
                         </div>
                     </td>
-                    <td style="width: 40%;text-align: center;">
+                    <td style="width: 30%;text-align: center;">
                         <strong style="font-size:18px;font-weight:bold;">greenestreet.com
                             <!--Greene Street Consignment<br />   
                             Manayunk<br />
@@ -76,10 +54,12 @@
                             267-335-5478
                             --></strong>
                     </td>
-                    <td style="width: 30%;text-align: right;font-size:14px;"><strong>CONSIGNMENT<br>
-                            CONTRACT<br> <p style="text-align: right;">#<?= $vendor['vendor_uuid']; ?></p></strong>
-
-                        <div style="clear:both;width:300px;margin-top:50px;float:right;" class="vendor_information">
+                    <td style="width: 40%;text-align: right;font-size:14px;">
+                        <strong>CONSIGNMENT<br>
+                            CONTRACT
+                        </strong>
+                        <p style="text-align: right;">#<?= $vendor['vendor_uuid']; ?></p>
+                        <div style="clear:both;" class="vendor_information">
                             <div class="row">
                                 <strong><?= $vendor['name']; ?></strong>
                             </div> 
@@ -222,33 +202,5 @@
         </p>
 
     </div>
-
-
-    <table style="float: right;padding-top: 10px;">
-        <tbody><tr>
-                <td>
-                    <?= drupal_render($form['submit']); ?>
-                </td>
-            </tr>
-        </tbody></table>
-
-    <script type="text/javascript">
-        function changeColumnView()
-        {
-            if (jQuery('.email_consignment_input:checked').val() == '1')
-            {
-                jQuery('.cop_col').show();
-                jQuery('.asis_col').hide();
-            } else {
-                jQuery('.cop_col').hide();
-                jQuery('.asis_col').show();
-            }
-        }
-        //editForm = new varienForm('edit_form', '');
-        jQuery(document).ready(function () {
-            changeColumnView();
-            jQuery('.email_consignment_input').change(function () {
-                changeColumnView();
-            });
-        })
-    </script>                        </div>
+                   
+</div>

@@ -87,7 +87,7 @@ function leaf_consignor_cron() {
         $products = getProduct($v['contract_id']);
         $productsCount = getProduct($v['contract_id'], TRUE);
         $html = theme('contract_summary_mail', ['contract' => $v, 'vendor' => $vendor, 'products' => $products, 'productsCount' => $productsCount]);
-        $xml_name = "contract-#{$v['contract_uuid']}.pdf";
+        $xml_name = "contract-{$v['contract_uuid']}.pdf";
         $data = print_pdf_generate_html($html, ['title' => 'Summary contract', 'name' => 'greenestreet', 'url' => 'http://leaf.greenestreet.com/contract']);
         if (!is_dir('public://contract')) {
             mkdir("public://contract", 0777);
@@ -95,7 +95,7 @@ function leaf_consignor_cron() {
         }
         
         $file = file_save_data($data, 'public://contract/' . $xml_name);
-        
+        drupal_chmod($file->uri, 0777);
         $attachment = array(
             'filecontent' => file_get_contents(drupal_realpath($file->uri)),
             'filename' => $xml_name,

@@ -56,18 +56,37 @@ function leaf_consignor_permission() {
 }
 
 function leaf_consignor_cron() {
-    $timeBegin = strtotime(date('Y-m-d 00:00:00')) + (5 * 24 * 60 * 60);
-    $timeEnd = strtotime(date('Y-m-d 23:59:59')) + (5 * 24 * 60 * 60);
+    //before 5 days claim date
+    processSendMailClaimDate();
+    //today is claim date
+    processSendMailClaimDate(FALSE);
+    
+}
+
+function processSendMailClaimDate($today = TRUE) {
+    if($today) {
+        $timeBegin = strtotime(date('Y-m-d 00:00:00'));
+        $timeEnd = strtotime(date('Y-m-d 23:59:59'));
+    }
+    else {
+        $timeBegin = strtotime(date('Y-m-d 00:00:00')) + (5 * 24 * 60 * 60);
+        $timeEnd = strtotime(date('Y-m-d 23:59:59')) + (5 * 24 * 60 * 60);
+    }
+    
     
     $contract = db_select('leaf_contract', 'v')
             ->fields('v')
             ->condition('v.close_date', $timeEnd, '<=')
-            ->condition('v.close_date', $timeBegin, '>=')
-            ->condition('v.send_claim_5', 0, '=')
-            ->execute()
-            ->fetchAllAssoc('contract_id');
-    
-    
+            ->condition('v.close_date', $timeBegin, '>=');
+    if($today) {
+        $contract->condition('v.send_claim', 0, '=');
+    }
+    else {
+        $contract->condition('v.send_claim_5', 0, '=');
+    }
+            
+    $contract = $contract->execute()
+        ->fetchAllAssoc('contract_id');
     
     foreach ($contract as $v) {   
         $v = json_decode(json_encode($v),true);
@@ -82,7 +101,7 @@ function leaf_consignor_cron() {
                 ->condition('p.id', $vendor['payment_id'], '=')
                 ->execute()
                 ->fetchAssoc();
-
+        
         $vendor['payment_name'] = $payment['name'];
         $products = getProduct($v['contract_id']);
         $productsCount = getProduct($v['contract_id'], TRUE);
@@ -96,33 +115,38 @@ function leaf_consignor_cron() {
         
         $file = file_save_data($data, 'public://contract/' . $xml_name);
         drupal_chmod($file->uri, 0777);
-        $attachment = array(
-            'filecontent' => file_get_contents(drupal_realpath($file->uri)),
-            'filename' => $xml_name,
-            'filemime' => 'application/pdf'
-        );
-
+        $attachment = file_load($file->fid);
+            
         $params = array(
-            'body' => theme('contract_claim_mail_5', ['contract' => $v, 'vendor' => $vendor]),
             'subject' => 'Contract is going to expire',
-            'headers' => 'simple',
+            'headers' => array('Content-Type' => 'text/html'),
             'attachment' => $attachment
         );
-
         
+        if($today) {
+            $params['body'] = theme('contract_claim_mail', ['contract' => $v, 'vendor' => $vendor]);
+        }
+        else {
+            $params['body'] = theme('contract_claim_mail_5', ['contract' => $v, 'vendor' => $vendor]);
+        }
+
         $module = 'leaf_consignor';
         $key = 'summary';
         $message = drupal_mail($module, $key, $vendor['email_address'], language_default(), $params);
         
         //update status send mail
+        if($today) {
+            $update = ['send_claim' => 1];
+        }
+        else {
+            $update = ['send_claim_5' => 1];
+        }
+        
         db_update('leaf_contract')
-                ->fields(array(
-                    'send_claim_5' => 1,
-                ))
-                ->condition('contract_id', $v['contract_id'], '=')
-                ->execute();
+            ->fields($update)
+            ->condition('contract_id', $v['contract_id'], '=')
+            ->execute();
     }
-    
 }
 
 /**
@@ -151,6 +175,14 @@ function leaf_consignor_theme() {
             'variables' => array(
                 'contract' => NULL,
                 ),
+        ),
+        
+        'contract_claim_mail' => array(
+            'template' => 'theming-claim-date',
+            'variables' => array(
+                'contract' => NULL,
+                'vendor' => NULL,
+            ),
         ),
     );
 }

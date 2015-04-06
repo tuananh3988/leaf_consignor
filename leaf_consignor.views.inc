@@ -134,6 +134,22 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_filter_date',
         ),
     );
+    
+    $data['leaf_contract']['claim_date'] = array(
+        'title' => t('Claim date field'),
+        'help' => t('Just a timestamp field.'),
+        'field' => array(
+            'handler' => 'views_handler_field_date',
+            'click sortable' => TRUE,
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort_date',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_date',
+        ),
+    );
+    
     $data['leaf_contract']['delete_flag'] = array(
         'title' => t('Delete flag'),
         'help' => t('Just an on/off field.'),

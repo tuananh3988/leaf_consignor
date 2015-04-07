@@ -390,7 +390,7 @@ function template_preprocess_contract_summary_form(&$variables)
 
     $vendor['payment_name'] = $payment['name'];
     $variables['vendor'] = $vendor;
-    $variables['products'] = getProduct($variables['contract']['contract_id']);
+    $variables['products'] = getProduct($variables['contract']['contract_id']);   
     $variables['productsCount'] = getProduct($variables['contract']['contract_id'], TRUE);
 }
 
@@ -419,9 +419,9 @@ function vendor_load($id)
 function getProduct($contractId, $count = false)
 {
     $query = db_select('leaf_product', 'p');
-    $query->join('leaf_item_category', 'i', 'i.id = p.item_category_id');
-    $query->join('leaf_color', 'c', 'c.id = p.color_id');
-    $query->join('leaf_brand', 'b', 'b.brand_id = p.brand_id');
+    $query->leftJoin('leaf_item_category', 'i', 'i.id = p.item_category_id');
+    $query->leftJoin('leaf_color', 'c', 'c.id = p.color_id');
+    $query->leftJoin('leaf_brand', 'b', 'b.brand_id = p.brand_id');
     $query->fields('p', ['product_id', 'sku', 'name', 'size', 'description', 'consignment_price', 'purchase_price', 'price', 'status', 'quantity', 'cop'])
             ->fields('i', ['name'])
             ->fields('c', ['name'])

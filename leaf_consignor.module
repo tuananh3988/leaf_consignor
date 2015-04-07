@@ -1,6 +1,7 @@
 <?php
 
-function leaf_consignor_menu() {
+function leaf_consignor_menu()
+{
     $items = array();
     $items['consignor'] = array(
         'title' => 'Consignor/Vendor',
@@ -41,13 +42,23 @@ function leaf_consignor_menu() {
         'type' => MENU_LOCAL_TASK,
     );
 
+    $items['vendor/updatedb'] = array(
+        'title' => 'Summary Contract / Vendor Update',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('form_update_csv'),
+        'access arguments' => array('access_leaf_consignor_content'),
+        'file' => 'leaf_consignor_update_csv.inc',
+        'type' => MENU_LOCAL_TASK,
+    );
+
     return $items;
 }
 
 /**
  * Implements hook_permission().
  */
-function leaf_consignor_permission() {
+function leaf_consignor_permission()
+{
     return array(
         'access_leaf_consignor_content' => array(
             'title' => t('Access content for the Leaf Consignor'),
@@ -55,53 +66,52 @@ function leaf_consignor_permission() {
     );
 }
 
-function leaf_consignor_cron() {
+function leaf_consignor_cron()
+{
     //before 5 days claim date
     processSendMailClaimDate();
     //today is claim date
     processSendMailClaimDate(FALSE);
-    
 }
 
-function processSendMailClaimDate($today = TRUE) {
-    if($today) {
+function processSendMailClaimDate($today = TRUE)
+{
+    if ($today) {
         $timeBegin = strtotime(date('Y-m-d 00:00:00'));
         $timeEnd = strtotime(date('Y-m-d 23:59:59'));
-    }
-    else {
+    } else {
         $timeBegin = strtotime(date('Y-m-d 00:00:00')) + (5 * 24 * 60 * 60);
         $timeEnd = strtotime(date('Y-m-d 23:59:59')) + (5 * 24 * 60 * 60);
     }
-    
-    
+
+
     $contract = db_select('leaf_contract', 'v')
             ->fields('v')
             ->condition('v.close_date', $timeEnd, '<=')
             ->condition('v.close_date', $timeBegin, '>=');
-    if($today) {
+    if ($today) {
         $contract->condition('v.send_claim', 0, '=');
-    }
-    else {
+    } else {
         $contract->condition('v.send_claim_5', 0, '=');
     }
-            
+
     $contract = $contract->execute()
-        ->fetchAllAssoc('contract_id');
-    
-    foreach ($contract as $v) {   
-        $v = json_decode(json_encode($v),true);
+            ->fetchAllAssoc('contract_id');
+
+    foreach ($contract as $v) {
+        $v = json_decode(json_encode($v), true);
         $vendor = db_select('leaf_vendor', 'v')
-            ->fields('v')
-            ->condition('v.vendor_id', $v['vendor_id'], '=')
-            ->execute()
-            ->fetchAssoc();
+                ->fields('v')
+                ->condition('v.vendor_id', $v['vendor_id'], '=')
+                ->execute()
+                ->fetchAssoc();
 
         $payment = db_select('leaf_payment', 'p')
                 ->fields('p')
                 ->condition('p.id', $vendor['payment_id'], '=')
                 ->execute()
                 ->fetchAssoc();
-        
+
         $vendor['payment_name'] = $payment['name'];
         $products = getProduct($v['contract_id']);
         $productsCount = getProduct($v['contract_id'], TRUE);
@@ -110,42 +120,39 @@ function processSendMailClaimDate($today = TRUE) {
         $data = print_pdf_generate_html($html, ['title' => 'Summary contract', 'name' => 'greenestreet', 'url' => 'http://leaf.greenestreet.com/contract']);
         if (!is_dir('public://contract')) {
             mkdir("public://contract", 0777);
-            
         }
-        
+
         $file = file_save_data($data, 'public://contract/' . $xml_name);
         drupal_chmod($file->uri, 0777);
         $attachment = file_load($file->fid);
-            
+
         $params = array(
             'subject' => 'Contract is going to expire',
             'headers' => array('Content-Type' => 'text/html'),
             'attachment' => $attachment
         );
-        
-        if($today) {
+
+        if ($today) {
             $params['body'] = theme('contract_claim_mail', ['contract' => $v, 'vendor' => $vendor]);
-        }
-        else {
+        } else {
             $params['body'] = theme('contract_claim_mail_5', ['contract' => $v, 'vendor' => $vendor]);
         }
 
         $module = 'leaf_consignor';
         $key = 'summary';
         $message = drupal_mail($module, $key, $vendor['email_address'], language_default(), $params);
-        
+
         //update status send mail
-        if($today) {
+        if ($today) {
             $update = ['send_claim' => 1];
-        }
-        else {
+        } else {
             $update = ['send_claim_5' => 1];
         }
-        
+
         db_update('leaf_contract')
-            ->fields($update)
-            ->condition('contract_id', $v['contract_id'], '=')
-            ->execute();
+                ->fields($update)
+                ->condition('contract_id', $v['contract_id'], '=')
+                ->execute();
     }
 }
 
@@ -154,29 +161,27 @@ function processSendMailClaimDate($today = TRUE) {
  *
  * Defines the theming capabilities provided by this module.
  */
-function leaf_consignor_theme() {
+function leaf_consignor_theme()
+{
     return array(
         'contract_summary_form' => array(
             'render element' => 'form',
             'template' => 'theming-contract-summary-form',
         ),
-        
         'contract_summary_mail' => array(
             'template' => 'theming-contract-summary-pdf',
             'variables' => array(
                 'contract' => NULL,
                 'vendor' => NULL,
                 'products' => NULL,
-                ),
+            ),
         ),
-        
         'contract_claim_mail_5' => array(
             'template' => 'theming-claim-date-5-day',
             'variables' => array(
                 'contract' => NULL,
-                ),
+            ),
         ),
-        
         'contract_claim_mail' => array(
             'template' => 'theming-claim-date',
             'variables' => array(
@@ -187,7 +192,8 @@ function leaf_consignor_theme() {
     );
 }
 
-function vendor_edit_form($form, &$form_state, $vendor) {
+function vendor_edit_form($form, &$form_state, $vendor)
+{
     $form = form_new_vendor();
 
     $form['new_1422973868224']['#title'] = 'Edit Vendor';
@@ -236,7 +242,8 @@ function vendor_edit_form($form, &$form_state, $vendor) {
     return $form;
 }
 
-function vendor_edit_form_submit($form, &$form_state) {
+function vendor_edit_form_submit($form, &$form_state)
+{
     $v = $form_state['values'];
 
     if ($v['op'] == 'Save' || $v['op'] == 'Save and Create new consignment contract') {
@@ -276,7 +283,8 @@ function vendor_edit_form_submit($form, &$form_state) {
     }
 }
 
-function contract_summary_form($form, &$form_state, $contract) {
+function contract_summary_form($form, &$form_state, $contract)
+{
 
     $products = getProduct($contract['contract_id']);
 
@@ -310,7 +318,8 @@ function contract_summary_form($form, &$form_state, $contract) {
     return $form;
 }
 
-function contract_summary_form_submit($form, &$form_state) {
+function contract_summary_form_submit($form, &$form_state)
+{
     foreach ($form_state['values'] as $k => $v) {
         $f = explode('-', $k);
         if ($f[0] == 'cop') {
@@ -329,31 +338,31 @@ function contract_summary_form_submit($form, &$form_state) {
     $params = array(
         'body' => render($form),
         'subject' => 'GREENE STREET WEB CONTRACT #' . $form['#contract']['contract_uuid'],
-        'headers' => 'simple',
+        'headers' => array('Content-Type' => 'text/html'),
     );
 
     $vendor = vendor_load($form['#contract']['vendor_id']);
     $module = 'leaf_consignor';
     $key = 'summary';
     $message = drupal_mail($module, $key, $vendor['email_address'], language_default(), $params);
-    
-   
 }
 
 /**
  * Implements hook_mail().
  */
-function leaf_consignor_mail($key, &$message, $params) {
+function leaf_consignor_mail($key, &$message, $params)
+{
     $message['subject'] = $params['subject'];
     $message['body'] = $params['body'];
 
     // Add attachment when available.
     if (isset($params['attachment'])) {
-      $message['params']['attachments'][] = $params['attachment'];
+        $message['params']['attachments'][] = $params['attachment'];
     }
 }
 
-function template_preprocess_contract_summary_form(&$variables) {
+function template_preprocess_contract_summary_form(&$variables)
+{
     foreach (element_children($variables['form']) as $key) {
         if (isset($variables['form'][$key]['#type'])) {
             $type = $variables['form'][$key]['#type'];
@@ -383,10 +392,10 @@ function template_preprocess_contract_summary_form(&$variables) {
     $variables['vendor'] = $vendor;
     $variables['products'] = getProduct($variables['contract']['contract_id']);
     $variables['productsCount'] = getProduct($variables['contract']['contract_id'], TRUE);
-    
 }
 
-function contract_load($id) {
+function contract_load($id)
+{
     $contract = db_select('leaf_contract', 'c')
             ->fields('c')
             ->condition('c.contract_id', $id, '=')
@@ -396,7 +405,8 @@ function contract_load($id) {
     return $contract;
 }
 
-function vendor_load($id) {
+function vendor_load($id)
+{
     $vendor = db_select('leaf_vendor', 'v')
             ->fields('v')
             ->condition('v.vendor_id', $id, '=')
@@ -406,7 +416,8 @@ function vendor_load($id) {
     return $vendor;
 }
 
-function getProduct($contractId, $count = false) {
+function getProduct($contractId, $count = false)
+{
     $query = db_select('leaf_product', 'p');
     $query->join('leaf_item_category', 'i', 'i.id = p.item_category_id');
     $query->join('leaf_color', 'c', 'c.id = p.color_id');
@@ -427,14 +438,16 @@ function getProduct($contractId, $count = false) {
 /**
  * Implements hook_views_api().
  */
-function leaf_consignor_views_api() {
+function leaf_consignor_views_api()
+{
     return array(
         'api' => 3,
         'path' => drupal_get_path('module', 'leaf_consignor'),
     );
 }
 
-function leaf_consignor_action_info() {
+function leaf_consignor_action_info()
+{
     return array(
         'leaf_consignor_delete_action' => array(
             'type' => 'entity',
@@ -453,7 +466,8 @@ function leaf_consignor_action_info() {
     );
 }
 
-function leaf_consignor_delete_action($cmt, $context = array()) {
+function leaf_consignor_delete_action($cmt, $context = array())
+{
     db_update('leaf_contract')
             ->fields(array(
                 'delete_flag' => 1,
@@ -462,7 +476,8 @@ function leaf_consignor_delete_action($cmt, $context = array()) {
             ->execute();
 }
 
-function leaf_consignor_delete_vendor_action($cmt, $context = array()) {
+function leaf_consignor_delete_vendor_action($cmt, $context = array())
+{
     db_update('leaf_vendor')
             ->fields(array(
                 'delete_flag' => 1,
@@ -471,7 +486,8 @@ function leaf_consignor_delete_vendor_action($cmt, $context = array()) {
             ->execute();
 }
 
-function leaf_consignor_entity_info() {
+function leaf_consignor_entity_info()
+{
     return array(
         'leaf_contract' => array(
             'label' => 'Contract entity item',
@@ -494,7 +510,8 @@ function leaf_consignor_entity_info() {
     );
 }
 
-function leaf_consignor_views_bulk_operations_form_alter(&$form, &$form_state, $vbo) {
+function leaf_consignor_views_bulk_operations_form_alter(&$form, &$form_state, $vbo)
+{
 
     if ($form_state['step'] == 'views_bulk_operations_confirm_form' && in_array($vbo->view->base_table, ['leaf_vendor', 'leaf_contract'])) {
         $str = '';

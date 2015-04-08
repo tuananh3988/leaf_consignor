@@ -51,6 +51,15 @@ function leaf_consignor_menu()
         'type' => MENU_LOCAL_TASK,
     );
 
+    $items['admin/config/system/leaf-export'] = array(
+        'title' => 'Leaf Export',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('form_export_consignor_data'),
+        'access arguments' => array('access_leaf_consignor_content'),
+        'file' => 'leaf_consignor_export.inc',
+        'type' => MENU_LOCAL_TASK,
+    );
+
     return $items;
 }
 
@@ -390,7 +399,7 @@ function template_preprocess_contract_summary_form(&$variables)
 
     $vendor['payment_name'] = $payment['name'];
     $variables['vendor'] = $vendor;
-    $variables['products'] = getProduct($variables['contract']['contract_id']);   
+    $variables['products'] = getProduct($variables['contract']['contract_id']);
     $variables['productsCount'] = getProduct($variables['contract']['contract_id'], TRUE);
 }
 

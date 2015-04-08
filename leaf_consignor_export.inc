@@ -2,7 +2,7 @@
 
 function form_export_consignor_data($form, &$form_state, $no_js_use = FALSE)
 {
-
+     
     $form['xls'] = array(
         '#type' => 'fieldset',
         '#title' => t('Export xls.'),
@@ -50,25 +50,94 @@ function form_export_consignor_data_submit($form, &$form_state)
 
         //export vendor
         $sheet = $xls->setActiveSheetIndex(2);
-        $vendor = db_select('leaf_vendor', 'v')
-                ->fields('v')
-                ->execute()
+        $vendor = db_select('leaf_vendor', 'v');
+        $vendor->leftJoin('leaf_payment', 'p', 'p.id = v.payment_id');
+                $vendor->fields('v')
+                ->addField('p', 'name', 'pname');
+        $vendor = $vendor->execute()
                 ->fetchAll();
-
+                
         $startRow = 9;
+        
         foreach($vendor as $v) {
+            $contracts = db_select('leaf_contract', 'c')
+                    ->fields('c')
+                    ->condition('vendor_id', $v->vendor_id, '=')
+                    ->execute()
+                    ->fetchAll();
+            
+            $contractStr = [];
+            foreach ($contracts as $c) {
+                $contractStr[] = $c->contract_uuid;
+            }
+            
             $sheet->setCellValueByColumnAndRow(0, $startRow, $v->name);
-            $sheet->setCellValueByColumnAndRow(1, $startRow, $v->name);
-            $sheet->setCellValueByColumnAndRow(0, $startRow, $v->name);
+            $sheet->setCellValueByColumnAndRow(4, $startRow, $v->address);
+            $sheet->setCellValueByColumnAndRow(5, $startRow, $v->city);
+            $sheet->setCellValueByColumnAndRow(6, $startRow, $v->state);
+            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->zip);
+            $sheet->setCellValueByColumnAndRow(8, $startRow, $v->phone_number);
+            $sheet->setCellValueByColumnAndRow(9, $startRow, $v->alternate_phone_number);
+            $sheet->setCellValueByColumnAndRow(12, $startRow, $v->vendor_uuid);
+            $sheet->setCellValueByColumnAndRow(13, $startRow, $v->vendor_uuid);
+            $sheet->setCellValueByColumnAndRow(17, $startRow, $v->email_address);
+            $sheet->setCellValueByColumnAndRow(19, $startRow, $v->pname);
+            $sheet->setCellValueByColumnAndRow(26, $startRow, implode(', ', $contractStr));
+            $startRow++;
         }
-        var_dump($vendor);die;
-        $sheet->setCellValueByColumnAndRow(0, 9, 'abcxyz');
-
+        
+        //export product
+        $sheet = $xls->setActiveSheetIndex(3);
+        $products = db_select('leaf_product', 'p');
+        $products->leftJoin('leaf_contract', 'c', 'c.contract_id = p.contract_id');
+        $products->leftJoin('leaf_vendor', 'v', 'v.vendor_id = c.vendor_id');
+        $products->leftJoin('leaf_item_category', 'ic', 'ic.id = p.item_category_id');
+        $products->fields('p')
+                ->fields('c', ['contract_uuid', 'from_date', 'close_date', 'claim_date']);
+        $products->addField('v', 'name', 'vendor_name');
+        $products->addField('v', 'vendor_uuid', 'vendor_uuid');  
+        $products->addField('ic', 'name', 'item_category_name');
+        $products = $products->execute()
+                ->fetchAll();
+        
+        $startRow = 11;
+        
+        foreach($products as $v) {           
+            $sheet->setCellValueByColumnAndRow(0, $startRow, $v->sku);
+            $sheet->setCellValueByColumnAndRow(1, $startRow, $v->name);
+            $sheet->setCellValueByColumnAndRow(1, $startRow, $v->item_category_name);
+            $sheet->setCellValueByColumnAndRow(2, $startRow, $v->item_category_name);
+            $sheet->setCellValueByColumnAndRow(4, $startRow, $v->description);
+            $sheet->setCellValueByColumnAndRow(8, $startRow, $v->size);
+            $sheet->setCellValueByColumnAndRow(11, $startRow, $v->vendor_name);
+            $sheet->setCellValueByColumnAndRow(12, $startRow, $v->vendor_uuid);
+            $sheet->setCellValueByColumnAndRow(13, $startRow, $v->price);
+            //$sheet->setCellValueByColumnAndRow(20, $startRow, $v->tax);
+            $sheet->setCellValueByColumnAndRow(22, $startRow, $v->quantity);
+            $sheet->setCellValueByColumnAndRow(42, $startRow, $v->contract_id);
+            $sheet->setCellValueByColumnAndRow(43, $startRow, date('Y-m-d', $v->from_date));
+            $sheet->setCellValueByColumnAndRow(44, $startRow, date('Y-m-d', $v->close_date));
+            $sheet->setCellValueByColumnAndRow(45, $startRow, date('Y-m-d', $v->claim_date));
+            $startRow++;
+        }
+        
         $writer = new PHPExcel_Writer_Excel5($xls);
         $writer->save($path);
+        
+        $http_headers = array(
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $name . '"',
+            'Content-Length' => filesize($path),
+        );
+        if(strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
+          $http_headers['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0';
+          $http_headers['Pragma'] = 'public';
+        } else {
+          $http_headers['Pragma'] = 'no-cache';
+        }
 
-        //$result = phpexcel_export($headers, $data, $path, $options);
 
-        //var_dump($result);die;
+        file_transfer($path, $http_headers);
+
     }
 }

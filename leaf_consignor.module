@@ -3,8 +3,8 @@
 function leaf_consignor_menu()
 {
     $items = array();
-    $items['consignor'] = array(
-        'title' => 'Consignor/Vendor',
+    $items['consignor/add'] = array(
+        'title' => 'Consignor Add',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('form_collection_consignor'),
         //'access callback' => TRUE,
@@ -14,14 +14,14 @@ function leaf_consignor_menu()
         'access arguments' => array('access_leaf_consignor_content'),
     );
 
-    $items['contract'] = array(
+    $items['contract/add'] = array(
         'title' => 'New Contract',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('form_collection_contract'),
         // 'access callback' => TRUE,
         //'description' => 'A set of ten tutorials',
         'file' => 'leaf_consignor.inc',
-        'type' => MENU_LOCAL_TASK,
+        'type' => MENU_NORMAL_ITEM,
         'access arguments' => array('access_leaf_consignor_content'),
     );
 
@@ -30,16 +30,16 @@ function leaf_consignor_menu()
         'page callback' => 'drupal_get_form',
         'page arguments' => array('contract_summary_form', 2),
         'access arguments' => array('access_leaf_consignor_content'),
-        'type' => MENU_LOCAL_TASK,
+        'type' => MENU_NORMAL_ITEM,
     );
 
     $items['vendor/%vendor/edit'] = array(
-        'title' => 'Summary Contract / Vendor Report',
+        'title' => 'Vendor Edit',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('vendor_edit_form', 1),
         'access arguments' => array('access_leaf_consignor_content'),
         'file' => 'leaf_consignor.inc',
-        'type' => MENU_LOCAL_TASK,
+        'type' => MENU_NORMAL_ITEM,
     );
 
     $items['vendor/updatedb'] = array(

@@ -50,16 +50,32 @@ function leaf_consignor_menu()
         'file' => 'leaf_consignor_update_csv.inc',
         'type' => MENU_LOCAL_TASK,
     );
-
-    $items['admin/config/system/leaf-export'] = array(
-        'title' => 'Leaf Export',
+    
+    $items['admin/config/system/leaf'] = array(
+        'title' => 'Leaf Export/Import for Pos',
+        'type' => MENU_NORMAL_ITEM,
         'page callback' => 'drupal_get_form',
         'page arguments' => array('form_export_consignor_data'),
         'access arguments' => array('access_leaf_consignor_content'),
         'file' => 'leaf_consignor_export.inc',
-        'type' => MENU_LOCAL_TASK,
     );
 
+//    $items['admin/config/system/leaf/im'] = array(
+//        'title' => 'Leaf Import',
+//        'type' => MENU_LOCAL_TASK,
+//        'page callback' => 'drupal_get_form',
+//        'page arguments' => array('form_import_consignor_data'),
+//        'access arguments' => array('access_leaf_consignor_content'),
+//        'file' => 'leaf_consignor_export.inc',
+//        
+//    );
+    
+    $items['admin/config/system/leaf/export'] = array(
+        'title' => 'Leaf Export',
+        'weight' => '-2',
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+    );
+    
     return $items;
 }
 

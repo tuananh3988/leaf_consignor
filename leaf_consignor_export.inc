@@ -98,7 +98,7 @@ function form_export_consignor_data_submit($form, &$form_state) {
         $products = $products->execute()
                 ->fetchAll();
 
-        $startRow = 11;
+        $startRow = 2;
 
         foreach ($products as $v) {
             $sheet->setCellValueByColumnAndRow(0, $startRow, $v->sku);
@@ -112,11 +112,11 @@ function form_export_consignor_data_submit($form, &$form_state) {
             $sheet->setCellValueByColumnAndRow(8, $startRow, $v->price);
             //$sheet->setCellValueByColumnAndRow(20, $startRow, $v->tax);
             $sheet->setCellValueByColumnAndRow(10, $startRow, $v->quantity);
-            $sheet->setCellValueByColumnAndRow(11, $startRow, $v->contract_id);
+            $sheet->setCellValueByColumnAndRow(11, $startRow, $v->contract_uuid);
             $sheet->setCellValueByColumnAndRow(12, $startRow, date('Y-m-d', $v->from_date));
             $sheet->setCellValueByColumnAndRow(13, $startRow, date('Y-m-d', $v->close_date));
             $sheet->setCellValueByColumnAndRow(14, $startRow, date('Y-m-d', $v->claim_date));
-            $sheet->setCellValueByColumnAndRow(14, $startRow, date('Y-m-d', $v->claim_date));
+            //$sheet->setCellValueByColumnAndRow(15, $startRow, date('Y-m-d', $v->claim_date));
             $startRow++;
         }
 
@@ -177,11 +177,11 @@ function form_import_consignor_data_submit($form, &$form_state) {
         $xls_reader = PHPExcel_IOFactory::createReaderForFile($file->uri);
 
         $xls = $xls_reader->load($file->uri);
-        
+
         $sheet = $xls->setActiveSheetIndex(2);
-        
+
         $a = $sheet->getCellByColumnAndRow(0,9)->getValue();
-        
+
         var_dump($a);die;
     }
 }

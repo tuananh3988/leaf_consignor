@@ -90,7 +90,7 @@ function ajax_example_add_more_remove_one($form, &$form_state) {
 }
 
 function form_collection_consignor_validate($form, &$form_state) {
-    
+
 }
 
 /**
@@ -105,6 +105,7 @@ function form_collection_consignor_submit($form, &$form_state) {
     //add to table vendor
     $vendorId = db_insert('leaf_vendor') // Table name no longer needs {}
             ->fields(array(
+                'vendor_uuid' => str_replace('.','',microtime(true)), // use microtime instead time() + vendor_id
                 'name' => $vendor['new_1422973901058'],
                 'address' => $vendor['new_1422973944836'],
                 'city' => $vendor['new_1422973972442'],
@@ -119,12 +120,6 @@ function form_collection_consignor_submit($form, &$form_state) {
             ))
             ->execute();
 
-    db_update('leaf_vendor')
-            ->fields(array(
-                'vendor_uuid' => time() . $vendorId,
-            ))
-            ->condition('vendor_id', $vendorId, '=')
-            ->execute();
 
     $contractId = save_contract_products($form_state, $vendorId);
     drupal_goto('contract/summary/' . $contractId);
@@ -146,6 +141,7 @@ function save_contract_products($form_state, $vendorId = null) {
     $closeDate = strtotime($contract['new_142297464756']['year'] . '-' . $contract['new_142297464756']['month'] . '-' . $contract['new_142297464756']['day']);
     $contractId = db_insert('leaf_contract') // Table name no longer needs {}
             ->fields(array(
+                'contract_uuid' => str_replace('.','',microtime(true)),
                 'from_date' => strtotime($contract['new_1422974647565']['year'] . '-' . $contract['new_1422974647565']['month'] . '-' . $contract['new_1422974647565']['day']),
                 'close_date' => $closeDate,
                 'claim_date' => $closeDate + 24 * 60 * 60,
@@ -162,14 +158,6 @@ function save_contract_products($form_state, $vendorId = null) {
             ))
             ->execute();
 
-    $contractUuid = (time() + 39) . $contractId;
-    db_update('leaf_contract')
-            ->fields(array(
-                'contract_uuid' => $contractUuid,
-            ))
-            ->condition('contract_id', $contractId, '=')
-            ->execute();
-
     //add to table product
     $products = $form_state['values']['wrap-product']['new_1423153824585'];
 
@@ -177,6 +165,7 @@ function save_contract_products($form_state, $vendorId = null) {
         if (!empty($record['new_1423157371520'])) {
             $data = [
                 'contract_id' => $contractId,
+                'sku' => str_replace('.','',microtime(true)),
                 'name' => $record['new_1423157371520'],
                 'item_category_id' => $record['new_1423157401928'],
                 'description' => $record['new_1423157454597'],
@@ -191,12 +180,6 @@ function save_contract_products($form_state, $vendorId = null) {
             ];
 
             $productId = db_insert('leaf_product')->fields($data)->execute();
-            db_update('leaf_product')
-                    ->fields(array(
-                        'sku' => (time() + 93) . $productId,
-                    ))
-                    ->condition('product_id', $productId, '=')
-                    ->execute();
         }
     }
 

@@ -104,6 +104,57 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
+    
+    $data['leaf_contract']['total_price'] = array(
+        'title' => t('Total Price'),
+        'help' => t('Total Price'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    $data['leaf_contract']['total_payout'] = array(
+        'title' => t('Total Payout'),
+        'help' => t('Total Payout'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+
+    $data['leaf_contract']['number_of_product'] = array(
+        'title' => t('Numbers of product'),
+        'help' => t('Numbers of product.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
 
     $data['leaf_contract']['from_date'] = array(
         'title' => t('From date field'),
@@ -218,6 +269,21 @@ function leaf_consignor_views_data() {
         ),
         'argument' => array(
             'handler' => 'views_handler_argument_numeric',
+        ),
+    );
+    
+    $data['leaf_vendor']['number_of_contract'] = array(
+        'title' => t('Numbers of contract'),
+        'help' => t('Numbers of contract.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
         ),
     );
 

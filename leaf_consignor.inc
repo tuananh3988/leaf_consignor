@@ -130,9 +130,15 @@ function form_collection_contract_submit($form, &$form_state) {
     drupal_goto('contract/summary/' . $contractId);
 }
 
-function save_contract_products($form_state, $vendorId = null) {
+function update_number_of_contract($vendorId, $count) {
+    db_query("UPDATE leaf_vendor SET number_of_contract = (SELECT COUNT(leaf_contract.contract_id) FROM leaf_contract WHERE leaf_contract.vendor_id = %d AND leaf_contract.delete_flag = 0) WHERE leaf_vendor.vendor_id = %d", $vendorId, $vendorId);
+    }
 
+
+function save_contract_products($form_state, $vendorId = null) {
     GLOBAL $user;
+    $products = $form_state['values']['wrap-product']['new_1423153824585'];
+    $count = 0;
     $contract = $form_state['values']['new_1422974499389'];
     if ($vendorId == null) {
         $vendorId = $contract['new_1423064090214'];
@@ -158,9 +164,8 @@ function save_contract_products($form_state, $vendorId = null) {
             ))
             ->execute();
 
+    update_number_of_contract($vendorId);
     //add to table product
-    $products = $form_state['values']['wrap-product']['new_1423153824585'];
-
     foreach ($products as $record) {
         if (!empty($record['new_1423157371520'])) {
             $data = [
@@ -180,8 +185,17 @@ function save_contract_products($form_state, $vendorId = null) {
             ];
 
             $productId = db_insert('leaf_product')->fields($data)->execute();
+            $count++;
         }
     }
+    
+    //update count product
+    db_update('leaf_contract') // Table name no longer needs {}
+        ->fields(array(
+          'number_of_product' => $count,
+        ))
+        ->condition('contract_id', $contractId, '=')
+        ->execute();
 
     return $contractId;
 }

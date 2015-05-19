@@ -358,6 +358,86 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_sort',
         ),
     );
+    
+    
+    $data['leaf_product']['table']['group'] = t('Product');
+    
+    $data['leaf_product']['table']['base'] = array(
+        'field' => 'product_id', // This is the identifier field for the view.
+        'title' => t('Product'),
+        'help' => t('Product.'),
+        'weight' => -11,
+    );
+
+    $data['leaf_product']['table']['join'] = array(
+        // Link ourself to the {file_managed} table so we can provide file->entity relationships.
+        'leaf_contract' => array(
+            'field' => 'contract_id',
+            'left_field' => 'contract_id',
+        ),
+    );
+    
+    $data['leaf_product']['product_id'] = array(
+        'title' => t('Product Id field'),
+        'help' => t('Just a numeric field.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+        ),
+    );
+    
+    $data['leaf_product']['sku'] = array(
+        'title' => t('sku field'),
+        'help' => t('Just a numeric field.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+        ),
+    );
+
+    
+    $data['leaf_product']['contract_id'] = array(
+        'title' => t('Contract Id field'),
+        'help' => t('Just a numeric field.'),
+        'relationship' => array(
+            'base' => 'leaf_contract', // The name of the table to join with.
+            'base field' => 'contract_id', // The name of the field on the joined table.
+            // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
+            'handler' => 'views_handler_relationship',
+            'label' => t('Default label for the relationship'),
+            'title' => t('Title shown when adding the relationship'),
+            'help' => t('More information on this relationship'),
+        ),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
 
 
     return $data;

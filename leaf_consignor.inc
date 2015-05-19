@@ -1,7 +1,6 @@
 <?php
 
 function form_collection_contract($form, &$form_state, $no_js_use = FALSE) {
-
     //select payment method
     $payment = db_select('leaf_payment', 'v')
             ->fields('v')
@@ -12,16 +11,10 @@ function form_collection_contract($form, &$form_state, $no_js_use = FALSE) {
         $optionpayment[$v->id] = $v->name;
     }
 
-
     $form = array();
     $form['#tree'] = TRUE;
-
-
-
     $formNewContract = form_new_contract(true);
     $form = array_merge($form, $formNewContract);
-
-
     $form['submit'] = array(
         '#type' => 'submit',
         '#value' => 'Submit',
@@ -41,9 +34,7 @@ function form_collection_contract($form, &$form_state, $no_js_use = FALSE) {
 function form_collection_consignor($form, &$form_state, $no_js_use = FALSE) {
     $form = array();
     $form['#tree'] = TRUE;
-
     $formNewVendor = form_new_vendor();
-
     $formNewContract = form_new_contract();
     $form = array_merge($form, $formNewVendor, $formNewContract);
 
@@ -122,7 +113,7 @@ function form_collection_consignor_submit($form, &$form_state) {
 
 
     $contractId = save_contract_products($form_state, $vendorId);
-    drupal_goto('contract/summary/' . $contractId);
+    drupal_goto('/contract/summary/' . $contractId);
 }
 
 function form_collection_contract_submit($form, &$form_state) {
@@ -130,9 +121,15 @@ function form_collection_contract_submit($form, &$form_state) {
     drupal_goto('contract/summary/' . $contractId);
 }
 
-function update_number_of_contract($vendorId, $count) {
-    db_query("UPDATE leaf_vendor SET number_of_contract = (SELECT COUNT(leaf_contract.contract_id) FROM leaf_contract WHERE leaf_contract.vendor_id = %d AND leaf_contract.delete_flag = 0) WHERE leaf_vendor.vendor_id = %d", $vendorId, $vendorId);
-    }
+function update_number_of_contract($vendorId) {
+    db_query("UPDATE leaf_vendor "
+            . "SET number_of_contract = "
+            . "(SELECT COUNT(leaf_contract.contract_id) "
+            . "FROM leaf_contract "
+            . "WHERE leaf_contract.vendor_id = :vendorId "
+            . "AND leaf_contract.delete_flag = 0) "
+            . "WHERE leaf_vendor.vendor_id = :vendorId", [':vendorId' => $vendorId]);
+}
 
 
 function save_contract_products($form_state, $vendorId = null) {
@@ -166,6 +163,8 @@ function save_contract_products($form_state, $vendorId = null) {
 
     update_number_of_contract($vendorId);
     //add to table product
+    $totalPayout = 0;
+    $totalPrice = 0;
     foreach ($products as $record) {
         if (!empty($record['new_1423157371520'])) {
             $data = [
@@ -186,13 +185,23 @@ function save_contract_products($form_state, $vendorId = null) {
 
             $productId = db_insert('leaf_product')->fields($data)->execute();
             $count++;
+            //total payout and total price
+            if($data['status'] == 1) {
+                $totalPayout += $data['consignment_price'];
+            }
+            
+            $totalPrice += $data['price'] * $data['quantity'];
         }
     }
     
-    //update count product
+    $totalPayout = ($contract['new_1422974650384'] * $totalPayout) / 100;
+    
+    //update contract
     db_update('leaf_contract') // Table name no longer needs {}
         ->fields(array(
-          'number_of_product' => $count,
+            'number_of_product' => $count,
+            'total_price' => $totalPrice,
+            'total_payout' => $totalPayout,
         ))
         ->condition('contract_id', $contractId, '=')
         ->execute();

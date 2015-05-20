@@ -52,7 +52,7 @@ function leaf_consignor_views_data() {
             // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
             'handler' => 'views_handler_relationship',
             'label' => t('Default label for the relationship'),
-            'title' => t('Title shown when adding the relationship'),
+            'title' => t('leaf_vendor relationship'),
             'help' => t('More information on this relationship'),
         ),
         'field' => array(
@@ -423,7 +423,7 @@ function leaf_consignor_views_data() {
             // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
             'handler' => 'views_handler_relationship',
             'label' => t('Default label for the relationship'),
-            'title' => t('Title shown when adding the relationship'),
+            'title' => t('leaf_contract relationship'),
             'help' => t('More information on this relationship'),
         ),
         'field' => array(
@@ -437,8 +437,403 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_sort',
         ),
     );
+    
+    $data['leaf_product']['name'] = array(
+        'title' => t('Name field'),
+        'help' => t('Name.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    $data['leaf_product']['item_category_id'] = array(
+        'title' => t('item_category_id field'),
+        'help' => t('Just a numeric field.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+        ),
+    );
+    
+    $data['leaf_product']['description'] = array(
+        'title' => t('description field'),
+        'help' => t('description.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    $data['leaf_product']['price'] = array(
+        'title' => t('price field'),
+        'help' => t('price.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    $data['leaf_product']['color_id'] = array(
+        'title' => t('color_id field'),
+        'help' => t('Just a numeric field.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+        ),
+    );
+    
+    $data['leaf_product']['size'] = array(
+        'title' => t('size field'),
+        'help' => t('size.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    $data['leaf_product']['brand_id'] = array(
+        'title' => t('brand_id field'),
+        'help' => t('Just a numeric field.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+        ),
+    );
+    
+    $data['leaf_product']['consignment_price'] = array(
+        'title' => t('consignment_price field'),
+        'help' => t('consignment_price.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    $data['leaf_product']['purchase_price'] = array(
+        'title' => t('purchase_price field'),
+        'help' => t('purchase_price.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    $data['leaf_product']['quantity'] = array(
+        'title' => t('quantity field'),
+        'help' => t('quantity.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    $data['leaf_product']['status'] = array(
+        'title' => t('status field'),
+        'help' => t('Just a numeric field.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+        ),
+    );
+    
+    $data['leaf_product']['created_date'] = array(
+        'title' => t('created_date field'),
+        'help' => t('created_date.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    
+    
+    $data['leaf_item_category']['table']['group'] = t('Product');
+    
+    $data['leaf_item_category']['table']['base'] = array(
+        'field' => 'id', // This is the identifier field for the view.
+        'title' => t('leaf_item_category id'),
+        'help' => t('leaf_item_category id.'),
+        'weight' => -11,
+    );
 
+    $data['leaf_item_category']['table']['join'] = array(
+        // Link ourself to the {file_managed} table so we can provide file->entity relationships.
+        'leaf_product' => array(
+            'field' => 'id',
+            'left_field' => 'item_category_id',
+        ),
+    );
+    
+    $data['leaf_item_category']['id'] = array(
+        'title' => t('leaf_item_category Id field'),
+        'help' => t('Just a numeric field.'),
+        'relationship' => array(
+            'base' => 'leaf_product', // The name of the table to join with.
+            'base field' => 'item_category_id', // The name of the field on the joined table.
+            // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
+            'handler' => 'views_handler_relationship',
+            'label' => t('leaf_item_category relationship'),
+            'title' => t('leaf_item_category category relationship'),
+            'help' => t('More information on this relationship'),
+        ),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+    
+    $data['leaf_item_category']['name'] = array(
+        'title' => t('leaf_item_category Name field'),
+        'help' => t('leaf_item_category Name.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
 
+    
+    $data['leaf_color']['table']['group'] = t('Product');
+    
+    $data['leaf_color']['table']['base'] = array(
+        'field' => 'id', // This is the identifier field for the view.
+        'title' => t('leaf_color id'),
+        'help' => t('leaf_color id.'),
+        'weight' => -11,
+    );
+
+    $data['leaf_color']['table']['join'] = array(
+        // Link ourself to the {file_managed} table so we can provide file->entity relationships.
+        'leaf_product' => array(
+            'field' => 'id',
+            'left_field' => 'color_id',
+        ),
+    );
+    
+    $data['leaf_color']['id'] = array(
+        'title' => t('leaf_color Id field'),
+        'help' => t('Just a numeric field.'),
+        'relationship' => array(
+            'base' => 'leaf_product', // The name of the table to join with.
+            'base field' => 'color_id', // The name of the field on the joined table.
+            // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
+            'handler' => 'views_handler_relationship',
+            'label' => t('leaf_color for the relationship'),
+            'title' => t('leaf_color category relationship'),
+            'help' => t('More information on this relationship'),
+        ),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+    
+    $data['leaf_color']['name'] = array(
+        'title' => t('leaf_color Name field'),
+        'help' => t('leaf_color Name.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
+    
+    
+    $data['leaf_brand']['table']['group'] = t('Product');
+    
+    $data['leaf_brand']['table']['base'] = array(
+        'field' => 'brand_id', // This is the identifier field for the view.
+        'title' => t('leaf_brand id'),
+        'help' => t('leaf_brand id.'),
+        'weight' => -11,
+    );
+
+    $data['leaf_brand']['table']['join'] = array(
+        // Link ourself to the {file_managed} table so we can provide file->entity relationships.
+        'leaf_product' => array(
+            'field' => 'brand_id',
+            'left_field' => 'brand_id',
+        ),
+    );
+    
+    $data['leaf_brand']['brand_id'] = array(
+        'title' => t('leaf_brand Id field'),
+        'help' => t('Just a numeric field.'),
+        'relationship' => array(
+            'base' => 'leaf_product', // The name of the table to join with.
+            'base field' => 'brand_id', // The name of the field on the joined table.
+            // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
+            'handler' => 'views_handler_relationship',
+            'label' => t('leaf_brand for the relationship'),
+            'title' => t('leaf_brand category relationship'),
+            'help' => t('More information on this relationship'),
+        ),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+    
+    $data['leaf_brand']['brand_name'] = array(
+        'title' => t('leaf_brand Name field'),
+        'help' => t('leaf_brand Name.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+            'click sortable' => TRUE, // This is use by the table display plugin.
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_string',
+        ),
+    );
 
     return $data;
 }

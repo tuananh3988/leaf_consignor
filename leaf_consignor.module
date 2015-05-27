@@ -50,7 +50,7 @@ function leaf_consignor_menu()
         'file' => 'leaf_consignor_update_csv.inc',
         'type' => MENU_LOCAL_TASK,
     );
-    
+
     $items['admin/config/system/leaf'] = array(
         'title' => 'Leaf Export/Import for Pos',
         'type' => MENU_NORMAL_ITEM,
@@ -67,15 +67,15 @@ function leaf_consignor_menu()
 //        'page arguments' => array('form_import_consignor_data'),
 //        'access arguments' => array('access_leaf_consignor_content'),
 //        'file' => 'leaf_consignor_export.inc',
-//        
+//
 //    );
-    
+
     $items['admin/config/system/leaf/export'] = array(
         'title' => 'Leaf Export',
         'weight' => '-2',
         'type' => MENU_DEFAULT_LOCAL_TASK,
     );
-    
+
     return $items;
 }
 
@@ -488,7 +488,129 @@ function leaf_consignor_action_info()
             'pass rows' => TRUE, //this will ensure that the entire views row is passed as part of the context in your action callback.
             'triggers' => array('any'),
         ),
+        'leaf_consignor_export_contract_action' => array(
+            'type' => 'entity',
+            'label' => t('Export Contract'),
+            'configurable' => FALSE,
+            'pass rows' => TRUE, //this will ensure that the entire views row is passed as part of the context in your action callback.
+            'triggers' => array('any'),
+            'aggregate' => TRUE,
+        ),
     );
+}
+
+function leaf_consignor_export_contract_action($cmt, $context = array())
+{
+    module_load_include('inc', 'phpexcel');
+    $headers = array();
+    $options = [
+        'template' => drupal_get_path('module', 'leaf_consignor') . '/templates/excel/contract_template.xls',
+        'format' => 'xls',
+        'ignore_headers' => TRUE,
+    ];
+
+    $path = 'public://xls/';
+    if (!is_dir($path)) {
+        mkdir($path, 0777);
+    }
+
+    $name = 'Contract_' . date('Ymd') . '.xls';
+
+    $path .= $name;
+
+    $library = libraries_load('PHPExcel');
+    $xls_reader = PHPExcel_IOFactory::createReaderForFile($options['template']);
+
+    $xls = $xls_reader->load($options['template']);
+    $sheet = $xls->getActiveSheet();
+    $startRow = 1;
+    $sheet->setCellValueByColumnAndRow(0, $startRow, 'Contract ID');
+    $sheet->setCellValueByColumnAndRow(1, $startRow, 'Vendor ID');
+    $sheet->setCellValueByColumnAndRow(2, $startRow, 'Vendor Name');
+    $sheet->setCellValueByColumnAndRow(3, $startRow, 'Start Date');
+    $sheet->setCellValueByColumnAndRow(4, $startRow, 'To Date');
+    $sheet->setCellValueByColumnAndRow(5, $startRow, 'Claim date');
+    $sheet->setCellValueByColumnAndRow(6, $startRow, 'Revenue Sharing(%)');
+    switch ($context['view_info']['display']) {
+        case 'page_2':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, 'Total Payout');
+
+            break;
+        case 'page_3':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, 'Numbers of contract');
+
+            break;
+        case 'page_4':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, 'Numbers of product');
+
+            break;
+        case 'page_5':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, 'Total Price');
+
+            break;
+        case 'page_6':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, 'Total Payout');
+
+            break;
+
+        default:
+            break;
+    }
+
+    $startRow = 2;
+
+    foreach ($context['rows'] as $v) {
+        $sheet->setCellValueByColumnAndRow(0, $startRow, $v->leaf_contract_contract_uuid);
+        $sheet->setCellValueByColumnAndRow(1, $startRow, $v->leaf_vendor_leaf_contract_vendor_uuid);
+        $sheet->setCellValueByColumnAndRow(2, $startRow, $v->leaf_vendor_leaf_contract_name);
+        $sheet->setCellValueByColumnAndRow(3, $startRow, date("m-d-Y", $v->leaf_contract_from_date));
+        $sheet->setCellValueByColumnAndRow(4, $startRow, date("m-d-Y", $v->leaf_contract_close_date));
+        $sheet->setCellValueByColumnAndRow(5, $startRow, date("m-d-Y", $v->leaf_contract_claim_date));
+        $sheet->setCellValueByColumnAndRow(6, $startRow, $v->leaf_contract_revenue_sharing);
+        switch ($context['view_info']['display']) {
+        case 'page_2':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
+
+            break;
+        case 'page_3':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_vendor_leaf_contract_number_of_contract);
+
+            break;
+        case 'page_4':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_number_of_product);
+
+            break;
+        case 'page_5':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_price);
+
+            break;
+        case 'page_6':
+            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
+
+            break;
+        default:
+            break;
+    }
+        $startRow++;
+    }
+
+    $writer = new PHPExcel_Writer_Excel5($xls);
+    $writer->save($path);
+
+    $http_headers = array(
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename="' . $name . '"',
+        'Content-Length' => filesize($path),
+    );
+    if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
+        $http_headers['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0';
+        $http_headers['Pragma'] = 'public';
+    } else {
+        $http_headers['Pragma'] = 'no-cache';
+    }
+
+
+    file_transfer($path, $http_headers);
 }
 
 function leaf_consignor_delete_action($cmt, $context = array())

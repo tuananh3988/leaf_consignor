@@ -1,6 +1,6 @@
 <?= ($form['hidden']); ?>
 <div id="page:main-container">
-    <div id="messages"></div>   
+    <div id="messages"></div>
         <div style="position: relative;;">
             <h2>Contract ID : #<?= $contract['contract_uuid']; ?> </h2>
             <em style="clear:both;float:left;padding-bottom: 10px;">Max-Date: <?= date('m-d-Y'); ?></em>
@@ -14,7 +14,7 @@
                             <td rowspan="2"></td>
                             <td><input checked="checked" class="email_consignment_input" type="radio" name="emailconsignment_option" id="emailconsignment_option_asis" value="as_is">&nbsp;<label for="email_consignment_asis">As is</label></td>
                             <td><input class="email_consignment_input" type="radio" name="emailconsignment_option" id="emailconsignment_option_cashoffer" value="cash_offer">&nbsp;<label for="email_consignment_cashoffer">Cash offer</label></td>
-                            
+
                         </tr>
                     </tbody></table>
                 -->
@@ -28,23 +28,23 @@
                             <div class="row">
                                 <label>Consign Date</label>
                                 <span><?= date('m-d-Y', ($contract['from_date'])); ?></span>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <label>Claim Date</label>
                                 <span><?= date('m-d-Y', ($contract['claim_date'])); ?></span>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <label>Total Items</label>
                                 <span><?= $productsCount ?></span>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <label>Tag Color</label>
                                 <span></span>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <label>Consign Fee</label>
                                 <span>$0.00</span>
-                            </div>        
+                            </div>
                         </div>
 
 
@@ -52,24 +52,24 @@
                             <div class="row">
                                 <label>Items Sold</label>
                                 <span>0</span>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <label>Total Sold</label>
                                 <span>$0.00</span>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <label>Total Due</label>
                                 <span>$0.00</span>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <label>Total Paid</label>
                                 <span>$0.00</span>
-                            </div>        
+                            </div>
                         </div>
                     </td>
                     <td style="width: 40%;text-align: center;">
                         <strong style="font-size:18px;font-weight:bold;">greenestreet.com
-                            <!--Greene Street Consignment<br />   
+                            <!--Greene Street Consignment<br />
                             Manayunk<br />
                             4313 Main Street<br />
                             Manayunk, PA 19127<br />
@@ -82,10 +82,10 @@
                         <div style="clear:both;width:300px;margin-top:50px;float:right;" class="vendor_information">
                             <div class="row">
                                 <strong><?= $vendor['name']; ?></strong>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <strong><?= $vendor['address']; ?></strong>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <strong><?= $vendor['city']; ?></strong>
                             </div>
@@ -98,13 +98,13 @@
                             <div class="row">
                                 <label>Phone Number</label>
                                 <span><?= $vendor['phone_number']; ?></span>
-                            </div> 
+                            </div>
                             <div class="row">
                                 <label>Payment Method</label>
                                 <span>
-                                    <?= $vendor['payment_name']; ?>                    
+                                    <?= $vendor['payment_name']; ?>
                                 </span>
-                            </div>        
+                            </div>
                         </div>
 
                     </td>
@@ -140,7 +140,16 @@
                     <th class="cop_col" style="display: table-cell;">COP*</th>
                     <?php endif; ?>
                 </tr>
+                <?php
+                    $totalCP = $totalPP = $totalP = $totalQ = 0;
+                ?>
                 <?php foreach ($products as $v) : ?>
+                <?php
+                    $totalCP += $v->consignment_price;
+                    $totalPP += $v->purchase_price;
+                    $totalP += $v->price;
+                    $totalQ += $v->quantity;
+                ?>
                 <tr>
                     <td><?= $v->sku; ?></td>
                     <td><?= $v->i_name; ?></td>
@@ -169,21 +178,49 @@
                             <?= drupal_render($form["cop-{$v->product_id}"]); ?>
                         </td>
                     <?php endif; ?>
-                        
+
                 </tr>
                 <?php endforeach; ?>
-               
-            </tbody></table> 
+                <?php if($products->rowCount() > 0):?>
+                <tr class="total-row">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <?php if(isset($form['email_type'])): ?>
+                        <?php if($form['email_type'] == 0): ?>
+                        <td class="asis_col" style="display: none;"><?= $totalCP;?></td>
+                        <td class="asis_col" style="display: none;"><?= $totalPP;?></td>
+                        <td class="asis_col" style="display: none;"><?= $totalP;?></td>
+                        <td class="asis_col" style="display: none;"><?= $totalQ;?></td>
+                        <td class="asis_col" style="display: none;"></td>
+                        <?php else : ?>
+                        <td class="cop_col" style="display: table-cell;"></td>
+                        <?php endif; ?>
+                    <?php else : ?>
+                    <td class="asis_col" style="display: none;"><?= $totalCP;?></td>
+                    <td class="asis_col" style="display: none;"></td>
+                    <td class="asis_col" style="display: none;"><?= $totalP;?></td>
+                    <td class="asis_col" style="display: none;"></td>
+                    <td class="asis_col" style="display: none;"></td>
+                    <td class="cop_col" style="display: table-cell;"></td>
+                    <?php endif; ?>
+                </tr>
+                <?php endif; ?>
+            </tbody></table>
 
 
     <div style="border-top: 2px solid gray;margin-top:10px;clear:both;padding-top:5px;">
         <p style="font-weight: bold;">TERMS: (I)   <?= $contract['revenue_sharing']; ?>% BASIC</p>
 
         <p style="text-align: center;font-weight: normal;">
-            You mailed us &lt;<?= $contract['number_items_off']; ?>&gt; pieces for online consignment. 
+            You mailed us &lt;<?= $contract['number_items_off']; ?>&gt; pieces for online consignment.
         </p>
         <p style="text-align: center;font-weight: normal;">
-            We have accepted &lt;<?= $contract['number_items_accepeted']; ?>&gt; pieces. 
+            We have accepted &lt;<?= $contract['number_items_accepeted']; ?>&gt; pieces.
         </p>
         <p style="text-align: center;font-weight: normal;">
             We have passed on &lt;<?= $contract['number_items_rejected']; ?>&gt; pieces.
@@ -193,7 +230,7 @@
 
         <p style="text-align: left;font-weight: normal;">
             <b>Passed-On Items:</b><br>
-            Please email <a href="mailto:onlinecustomerservice@greenestreet.com">onlinecustomerservice@greenestreet.com</a> within 7 days of the enclosed emailed contract to reclaim any items that 
+            Please email <a href="mailto:onlinecustomerservice@greenestreet.com">onlinecustomerservice@greenestreet.com</a> within 7 days of the enclosed emailed contract to reclaim any items that
             were not accepted, and we will return those items to you for a flat fee of $12.95.
             <br><br>
         </p>
@@ -202,8 +239,8 @@
             <b>Claim Date and Commission:</b><br>
             Greene Street will email updates 5 days prior to Claim Date and ON the Claim Date.<br><br>
 
-            The Claim Date is the <b style="text-decoration: underline;">last day</b> of your contract term.  You may request your unsold items to be shipped back to you for a flat 
-            fee of $12.95 within 5 days <b style="text-decoration: underline;">prior to</b> the Claim Date.  This fee will be PayPal invoiced.  Items become property of 
+            The Claim Date is the <b style="text-decoration: underline;">last day</b> of your contract term.  You may request your unsold items to be shipped back to you for a flat
+            fee of $12.95 within 5 days <b style="text-decoration: underline;">prior to</b> the Claim Date.  This fee will be PayPal invoiced.  Items become property of
             Greene Street immediately after the Claim Date.<br><br>
 
             Commission checks for sold items are mailed immediately after your Claim Date.  Please allow time for delivery.<br><br>
@@ -215,10 +252,10 @@
 
         <br><br>
         <p style="text-align: center;font-weight: bold;">
-            Visit our website: <a href="http://www.greenestreet.com">www.greenestreet.com</a> 
+            Visit our website: <a href="http://www.greenestreet.com">www.greenestreet.com</a>
         </p>
         <p style="text-align: center;font-weight: bold;">
-            <a href="mailto:onlinecustomerservice@greenestreet.com">onlinecustomerservice@greenestreet.com</a> 
+            <a href="mailto:onlinecustomerservice@greenestreet.com">onlinecustomerservice@greenestreet.com</a>
         </p>
 
     </div>
@@ -239,9 +276,11 @@
             {
                 jQuery('.cop_col').show();
                 jQuery('.asis_col').hide();
+                jQuery('.total-row').hide();
             } else {
                 jQuery('.cop_col').hide();
                 jQuery('.asis_col').show();
+                jQuery('.total-row').show();
             }
         }
         //editForm = new varienForm('edit_form', '');

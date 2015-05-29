@@ -3,6 +3,13 @@
 function leaf_consignor_menu()
 {
     $items = array();
+    $items['vendor/autocomplete'] = array(
+        'title' => 'Autocomplete for vendor',
+        'page callback' => '_vendor_autocomplete',
+        'access arguments' => array('access_leaf_consignor_content'), //or whatever permission makes sense
+        'type' => MENU_CALLBACK
+    );
+
     $items['consignor/add'] = array(
         'title' => 'Consignor Add',
         'page callback' => 'drupal_get_form',
@@ -77,6 +84,32 @@ function leaf_consignor_menu()
     );
 
     return $items;
+}
+
+/**
+ * autocomplete helper
+ * $string = string for search
+ */
+function _vendor_autocomplete($string)
+{
+    $matches = array();
+    $db_or = db_or();
+    $db_or->condition('vendor_uuid', '%' . db_like($string) . '%', 'LIKE');
+    $db_or->condition('name', '%' . db_like($string) . '%', 'LIKE');
+    $result = db_select('leaf_vendor', 'c')
+            ->fields('c', array('vendor_id', 'vendor_uuid', 'name'))
+            ->condition($db_or)
+            ->range(0, 15)
+            ->execute();
+
+    // save the query to matches
+    foreach ($result as $row) {
+        $matches[$row->vendor_id] = '#' . check_plain($row->vendor_uuid) . ' - ' . $row->name;
+    }
+
+    // Return the result to the form in json
+    drupal_json_output($matches);
+
 }
 
 /**
@@ -576,29 +609,29 @@ function leaf_consignor_export_items_sold_action($cmt, $context = array())
         $sheet->setCellValueByColumnAndRow(5, $startRow, date("m-d-Y", $v->leaf_contract_claim_date));
         $sheet->setCellValueByColumnAndRow(6, $startRow, $v->leaf_contract_revenue_sharing);
         switch ($context['view_info']['display']) {
-        case 'page_2':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
+            case 'page_2':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
 
-            break;
-        case 'page_3':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_vendor_leaf_contract_number_of_contract);
+                break;
+            case 'page_3':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_vendor_leaf_contract_number_of_contract);
 
-            break;
-        case 'page_4':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_number_of_product);
+                break;
+            case 'page_4':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_number_of_product);
 
-            break;
-        case 'page_5':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_price);
+                break;
+            case 'page_5':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_price);
 
-            break;
-        case 'page_6':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
+                break;
+            case 'page_6':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
 
-            break;
-        default:
-            break;
-    }
+                break;
+            default:
+                break;
+        }
         $startRow++;
     }
 
@@ -690,29 +723,29 @@ function leaf_consignor_export_contract_action($cmt, $context = array())
         $sheet->setCellValueByColumnAndRow(5, $startRow, date("m-d-Y", $v->leaf_contract_claim_date));
         $sheet->setCellValueByColumnAndRow(6, $startRow, $v->leaf_contract_revenue_sharing);
         switch ($context['view_info']['display']) {
-        case 'page_2':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
+            case 'page_2':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
 
-            break;
-        case 'page_3':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_vendor_leaf_contract_number_of_contract);
+                break;
+            case 'page_3':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_vendor_leaf_contract_number_of_contract);
 
-            break;
-        case 'page_4':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_number_of_product);
+                break;
+            case 'page_4':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_number_of_product);
 
-            break;
-        case 'page_5':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_price);
+                break;
+            case 'page_5':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_price);
 
-            break;
-        case 'page_6':
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
+                break;
+            case 'page_6':
+                $sheet->setCellValueByColumnAndRow(7, $startRow, $v->leaf_contract_total_payout);
 
-            break;
-        default:
-            break;
-    }
+                break;
+            default:
+                break;
+        }
         $startRow++;
     }
 

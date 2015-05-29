@@ -189,13 +189,13 @@ function save_contract_products($form_state, $vendorId = null) {
             if($data['status'] == 1) {
                 $totalPayout += $data['consignment_price'];
             }
-            
+
             $totalPrice += $data['price'] * $data['quantity'];
         }
     }
-    
+
     $totalPayout = ($contract['new_1422974650384'] * $totalPayout) / 100;
-    
+
     //update contract
     db_update('leaf_contract') // Table name no longer needs {}
         ->fields(array(
@@ -298,7 +298,7 @@ function form_new_contract($vendor = false) {
             ->fetchAll();
     $optionStore = array();
     foreach ($stores as $v) {
-        $optionStore[$v->id] = $v->name;
+        $optionStore[$v->id] = '#' . $v->shop_code . ' - ' .$v->name;
     }
 
     //select color
@@ -356,18 +356,19 @@ function form_new_contract($vendor = false) {
         $form['new_1422974499389']['new_1423064090214'] = array(
             '#weight' => '-2',
             '#required' => '1',
-            '#multiple' => '0',
+            //'#multiple' => '0',
             '#key_type_toggled' => '1',
-            '#type' => 'select',
-            '#options' => $optionVendor,
+            '#type' => 'textfield',
+            //'#options' => $optionVendor,
+            '#autocomplete_path' => 'vendor/autocomplete',
             '#multiple_toggle' => '1',
             '#title' => t('Vendor id'),
         );
 
-        $vd = arg(1);
-        if (!empty($vd)) {
-            $form['new_1422974499389']['new_1423064090214']['#default_value'] = $vd;
-        }
+//        $vd = arg(1);
+//        if (!empty($vd)) {
+//            $form['new_1422974499389']['new_1423064090214']['#default_value'] = $vd;
+//        }
     }
 
 

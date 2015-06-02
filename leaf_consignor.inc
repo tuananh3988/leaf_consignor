@@ -138,7 +138,19 @@ function save_contract_products($form_state, $vendorId = null) {
     $count = 0;
     $contract = $form_state['values']['new_1422974499389'];
     if ($vendorId == null) {
-        $vendorId = $contract['new_1423064090214'];
+        $pieces = explode(" - ", $contract['new_1423064090214']);
+
+        $vendorUuid = substr($pieces[0], 1);
+
+        $result = db_select('leaf_vendor', 'n')
+            ->fields('n')
+            ->condition('vendor_uuid', $vendorUuid, '=')
+            ->execute()
+            ->fetchAssoc();
+
+        $vendorId = $result['vendor_id'];
+
+
     }
     //add to table contract
     $closeDate = strtotime($contract['new_142297464756']['year'] . '-' . $contract['new_142297464756']['month'] . '-' . $contract['new_142297464756']['day']);

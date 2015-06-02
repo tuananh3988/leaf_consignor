@@ -104,7 +104,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
+
     $data['leaf_contract']['total_price'] = array(
         'title' => t('Total Price'),
         'help' => t('Total Price'),
@@ -122,7 +122,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
+
     $data['leaf_contract']['total_payout'] = array(
         'title' => t('Total Payout'),
         'help' => t('Total Payout'),
@@ -185,7 +185,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_filter_date',
         ),
     );
-    
+
     $data['leaf_contract']['claim_date'] = array(
         'title' => t('Claim date field'),
         'help' => t('Just a timestamp field.'),
@@ -200,7 +200,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_filter_date',
         ),
     );
-    
+
     $data['leaf_contract']['delete_flag'] = array(
         'title' => t('Delete flag'),
         'help' => t('Just an on/off field.'),
@@ -271,7 +271,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_numeric',
         ),
     );
-    
+
     $data['leaf_vendor']['number_of_contract'] = array(
         'title' => t('Numbers of contract'),
         'help' => t('Numbers of contract.'),
@@ -358,10 +358,10 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_sort',
         ),
     );
-    
-    
+
+
     $data['leaf_product']['table']['group'] = t('Product');
-    
+
     $data['leaf_product']['table']['base'] = array(
         'field' => 'product_id', // This is the identifier field for the view.
         'title' => t('Product'),
@@ -376,7 +376,7 @@ function leaf_consignor_views_data() {
             'left_field' => 'contract_id',
         ),
     );
-    
+
     $data['leaf_product']['product_id'] = array(
         'title' => t('Product Id field'),
         'help' => t('Just a numeric field.'),
@@ -394,7 +394,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_numeric',
         ),
     );
-    
+
     $data['leaf_product']['sku'] = array(
         'title' => t('sku field'),
         'help' => t('Just a numeric field.'),
@@ -413,7 +413,7 @@ function leaf_consignor_views_data() {
         ),
     );
 
-    
+
     $data['leaf_product']['contract_id'] = array(
         'title' => t('Contract Id field'),
         'help' => t('Just a numeric field.'),
@@ -437,7 +437,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_sort',
         ),
     );
-    
+
     $data['leaf_product']['name'] = array(
         'title' => t('Name field'),
         'help' => t('Name.'),
@@ -455,7 +455,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
+
     $data['leaf_product']['item_category_id'] = array(
         'title' => t('item_category_id field'),
         'help' => t('Just a numeric field.'),
@@ -473,7 +473,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_numeric',
         ),
     );
-    
+
     $data['leaf_product']['description'] = array(
         'title' => t('description field'),
         'help' => t('description.'),
@@ -491,25 +491,26 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
+
     $data['leaf_product']['price'] = array(
         'title' => t('price field'),
-        'help' => t('price.'),
+        'help' => t('price field.'),
         'field' => array(
-            'handler' => 'views_handler_field',
-            'click sortable' => TRUE, // This is use by the table display plugin.
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
         ),
         'sort' => array(
             'handler' => 'views_handler_sort',
         ),
-        'filter' => array(
-            'handler' => 'views_handler_filter_string',
-        ),
         'argument' => array(
-            'handler' => 'views_handler_argument_string',
+            'handler' => 'views_handler_argument_numeric',
         ),
     );
-    
+
+
     $data['leaf_product']['color_id'] = array(
         'title' => t('color_id field'),
         'help' => t('Just a numeric field.'),
@@ -527,7 +528,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_numeric',
         ),
     );
-    
+
     $data['leaf_product']['size'] = array(
         'title' => t('size field'),
         'help' => t('size.'),
@@ -545,7 +546,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
+
     $data['leaf_product']['brand_id'] = array(
         'title' => t('brand_id field'),
         'help' => t('Just a numeric field.'),
@@ -563,7 +564,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_numeric',
         ),
     );
-    
+
     $data['leaf_product']['consignment_price'] = array(
         'title' => t('consignment_price field'),
         'help' => t('consignment_price.'),
@@ -581,7 +582,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
+
     $data['leaf_product']['purchase_price'] = array(
         'title' => t('purchase_price field'),
         'help' => t('purchase_price.'),
@@ -599,7 +600,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
+
     $data['leaf_product']['quantity'] = array(
         'title' => t('quantity field'),
         'help' => t('quantity.'),
@@ -617,7 +618,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
+
     $data['leaf_product']['status'] = array(
         'title' => t('status field'),
         'help' => t('Just a numeric field.'),
@@ -635,7 +636,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_numeric',
         ),
     );
-    
+
     $data['leaf_product']['created_date'] = array(
         'title' => t('created_date field'),
         'help' => t('created_date.'),
@@ -653,11 +654,11 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
-    
-    
+
+
+
     $data['leaf_item_category']['table']['group'] = t('Product');
-    
+
     $data['leaf_item_category']['table']['base'] = array(
         'field' => 'id', // This is the identifier field for the view.
         'title' => t('leaf_item_category id'),
@@ -672,7 +673,7 @@ function leaf_consignor_views_data() {
             'left_field' => 'item_category_id',
         ),
     );
-    
+
     $data['leaf_item_category']['id'] = array(
         'title' => t('leaf_item_category Id field'),
         'help' => t('Just a numeric field.'),
@@ -696,7 +697,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_sort',
         ),
     );
-    
+
     $data['leaf_item_category']['name'] = array(
         'title' => t('leaf_item_category Name field'),
         'help' => t('leaf_item_category Name.'),
@@ -715,9 +716,9 @@ function leaf_consignor_views_data() {
         ),
     );
 
-    
+
     $data['leaf_color']['table']['group'] = t('Product');
-    
+
     $data['leaf_color']['table']['base'] = array(
         'field' => 'id', // This is the identifier field for the view.
         'title' => t('leaf_color id'),
@@ -732,7 +733,7 @@ function leaf_consignor_views_data() {
             'left_field' => 'color_id',
         ),
     );
-    
+
     $data['leaf_color']['id'] = array(
         'title' => t('leaf_color Id field'),
         'help' => t('Just a numeric field.'),
@@ -756,7 +757,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_sort',
         ),
     );
-    
+
     $data['leaf_color']['name'] = array(
         'title' => t('leaf_color Name field'),
         'help' => t('leaf_color Name.'),
@@ -774,10 +775,10 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_argument_string',
         ),
     );
-    
-    
+
+
     $data['leaf_brand']['table']['group'] = t('Product');
-    
+
     $data['leaf_brand']['table']['base'] = array(
         'field' => 'brand_id', // This is the identifier field for the view.
         'title' => t('leaf_brand id'),
@@ -792,7 +793,7 @@ function leaf_consignor_views_data() {
             'left_field' => 'brand_id',
         ),
     );
-    
+
     $data['leaf_brand']['brand_id'] = array(
         'title' => t('leaf_brand Id field'),
         'help' => t('Just a numeric field.'),
@@ -816,7 +817,7 @@ function leaf_consignor_views_data() {
             'handler' => 'views_handler_sort',
         ),
     );
-    
+
     $data['leaf_brand']['brand_name'] = array(
         'title' => t('leaf_brand Name field'),
         'help' => t('leaf_brand Name.'),

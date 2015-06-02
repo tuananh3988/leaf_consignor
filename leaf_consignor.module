@@ -104,7 +104,7 @@ function _vendor_autocomplete($string)
 
     // save the query to matches
     foreach ($result as $row) {
-        $matches[$row->vendor_id] = '#' . check_plain($row->vendor_uuid) . ' - ' . $row->name;
+        $matches['#' . check_plain($row->vendor_uuid) . ' - ' . $row->name] = '#' . check_plain($row->vendor_uuid) . ' - ' . $row->name;
     }
 
     // Return the result to the form in json

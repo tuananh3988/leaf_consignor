@@ -76,6 +76,13 @@ function leaf_consignor_menu()
 //        'file' => 'leaf_consignor_export.inc',
 //
 //    );
+    $items['vendor-detail/%ctools_js/%'] = array(
+        'title' => 'The Happy Modal',
+        'page arguments' => array(1, 2),
+        'page callback' => 'vendor_detail_modal_page',
+        'access callback' => TRUE,
+        'type' => MENU_NORMAL_ITEM,
+    );
 
     $items['admin/config/system/leaf/export'] = array(
         'title' => 'Leaf Export',
@@ -85,6 +92,77 @@ function leaf_consignor_menu()
 
     return $items;
 }
+
+function vendor_detail_modal_page($js = NULL, $nid = NULL)
+{
+    if ($nid == NULL) {
+        // You can customize the string below, or use a drupal_goto() to
+        // send the user to a custom error page.
+        return 'No node id was sent. Error.';
+    }
+    if ($js) {
+        // Required includes for ctools to work:
+        ctools_include('modal');
+        ctools_include('ajax');
+    }
+
+    // Load the node obkect
+    $vendor = vendor_load($nid);
+
+    $contents = theme('vendor_detail_popup', ['vendor' => $vendor]);
+    return ctools_modal_render($vendor['name'], $contents);
+}
+
+/**
+ * inside happy.module
+ * Implements hook_views_pre_render()
+ */
+function leaf_consignor_views_pre_render(&$views)
+{
+
+    // The View name I set up prior is "Happy Titles"
+    if ($views->name == 'vendor_test') {
+
+        // Include the CTools tools that we need.
+        ctools_include('ajax');
+        ctools_include('modal');
+        // Add CTools' javascript to the page.
+        ctools_modal_add_js();
+        // Create our own javascript that will be used to theme a modal.
+        $happy_style = array(
+            'happy-modal-style' => array(
+                'modalSize' => array(
+                    'type' => 'fixed',
+                    'width' => 600,
+                    'height' => 440,
+                    'addWidth' => 10,
+                    'addHeight' => 10,
+                    'contentRight' => 10,
+                    'contentBottom' => 0,
+                ),
+                'modalOptions' => array(
+                    'opacity' => .6,
+                    //'background-color' => '#684C31',
+                ),
+                'animation' => 'fadeIn',
+                //'modalTheme' => 'happy_modal',
+                // Customize the AJAX throbber like so:
+                // This function assumes the images are inside the module directory's "images"
+                // directory:
+                // ctools_image_path($image, $module = 'ctools', $dir = 'images')
+                //'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'happy'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
+                //'closeImage' => theme('image', array('path' => ctools_image_path('modal-close.png', 'happy'), 'alt' => t('Close window'), 'title' => t('Close window'))),
+            ),
+        );
+        // Add the settings array defined above to Drupal 7's JS settings:
+        drupal_add_js($happy_style, 'setting');
+        // The function below assumes the happy.js file resides in [module_dir]/js
+        //ctools_add_js('leaf_consignor', 'vendor_detail_modal');
+        // The function below assumes the happy.css file resides in [module_dir]/css
+        //ctools_add_css('happy', 'happy');
+    }
+}
+
 
 /**
  * autocomplete helper
@@ -109,7 +187,6 @@ function _vendor_autocomplete($string)
 
     // Return the result to the form in json
     drupal_json_output($matches);
-
 }
 
 /**
@@ -244,6 +321,12 @@ function leaf_consignor_theme()
             'template' => 'theming-claim-date',
             'variables' => array(
                 'contract' => NULL,
+                'vendor' => NULL,
+            ),
+        ),
+        'vendor_detail_popup' => array(
+            'template' => 'vendor-detail-popup',
+            'variables' => array(
                 'vendor' => NULL,
             ),
         ),

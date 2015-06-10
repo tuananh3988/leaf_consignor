@@ -54,19 +54,13 @@
     <tr>
         <td>
             <label>Payment Method: </label>
-            <span><?= $vendor['vendor_uuid']; ?></span>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <label>Active contracts: </label>
-            <span>0</span>
+            <span><?= $vendor['payment_name']; ?></span>
         </td>
     </tr>
     <tr>
         <td>
             <label>Contracts: </label>
-            <span>2</span>
+            <span><?= $vendor['number_of_contract']; ?></span>
         </td>
     </tr>
 </tbody>

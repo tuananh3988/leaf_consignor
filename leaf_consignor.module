@@ -108,6 +108,8 @@ function vendor_detail_modal_page($js = NULL, $nid = NULL)
 
     // Load the node obkect
     $vendor = vendor_load($nid);
+    $payment = payment_load($vendor['payment_id']);
+    $vendor['payment_name'] = $payment['name'];
 
     $contents = theme('vendor_detail_popup', ['vendor' => $vendor]);
     return ctools_modal_render($vendor['name'], $contents);
@@ -121,7 +123,7 @@ function leaf_consignor_views_pre_render(&$views)
 {
 
     // The View name I set up prior is "Happy Titles"
-    if ($views->name == 'vendor_test') {
+    if ($views->name == 'Contract' || $views->name == 'items_sold') {
 
         // Include the CTools tools that we need.
         ctools_include('ajax');
@@ -142,16 +144,16 @@ function leaf_consignor_views_pre_render(&$views)
                 ),
                 'modalOptions' => array(
                     'opacity' => .6,
-                    //'background-color' => '#684C31',
+                //'background-color' => '#684C31',
                 ),
                 'animation' => 'fadeIn',
-                //'modalTheme' => 'happy_modal',
-                // Customize the AJAX throbber like so:
-                // This function assumes the images are inside the module directory's "images"
-                // directory:
-                // ctools_image_path($image, $module = 'ctools', $dir = 'images')
-                //'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'happy'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
-                //'closeImage' => theme('image', array('path' => ctools_image_path('modal-close.png', 'happy'), 'alt' => t('Close window'), 'title' => t('Close window'))),
+            //'modalTheme' => 'happy_modal',
+            // Customize the AJAX throbber like so:
+            // This function assumes the images are inside the module directory's "images"
+            // directory:
+            // ctools_image_path($image, $module = 'ctools', $dir = 'images')
+            //'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'happy'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
+            //'closeImage' => theme('image', array('path' => ctools_image_path('modal-close.png', 'happy'), 'alt' => t('Close window'), 'title' => t('Close window'))),
             ),
         );
         // Add the settings array defined above to Drupal 7's JS settings:
@@ -162,7 +164,6 @@ function leaf_consignor_views_pre_render(&$views)
         //ctools_add_css('happy', 'happy');
     }
 }
-
 
 /**
  * autocomplete helper
@@ -544,6 +545,17 @@ function contract_load($id)
             ->fetchAssoc();
 
     return $contract;
+}
+
+function payment_load($id)
+{
+    $payment = db_select('leaf_payment', 'c')
+            ->fields('c')
+            ->condition('c.id', $id, '=')
+            ->execute()
+            ->fetchAssoc();
+
+    return $payment;
 }
 
 function vendor_load($id)

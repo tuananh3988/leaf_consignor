@@ -67,26 +67,22 @@ function leaf_consignor_views_data() {
         ),
     );
 
-    // Example plain text field.
     $data['leaf_contract']['revenue_sharing'] = array(
         'title' => t('revenue sharing field'),
         'help' => t('revenue_sharing.'),
         'field' => array(
-            'handler' => 'views_handler_field',
-            'click sortable' => TRUE, // This is use by the table display plugin.
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
         ),
         'sort' => array(
             'handler' => 'views_handler_sort',
         ),
-        'filter' => array(
-            'handler' => 'views_handler_filter_string',
-        ),
-        'argument' => array(
-            'handler' => 'views_handler_argument_string',
-        ),
     );
 
-    // Example plain text field.
+     // Example plain text field.
     $data['leaf_contract']['contract_uuid'] = array(
         'title' => t('Contract uuid field'),
         'help' => t('Contract uuid'),

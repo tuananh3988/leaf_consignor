@@ -95,28 +95,29 @@ function form_export_consignor_data_submit($form, &$form_state) {
         $products->addField('v', 'name', 'vendor_name');
         $products->addField('v', 'vendor_uuid', 'vendor_uuid');
         $products->addField('ic', 'name', 'item_category_name');
+        $products->addField('ic', 'type', 'type');
         $products = $products->execute()
                 ->fetchAll();
 
-        $startRow = 2;
+        $startRow = 3;
 
         foreach ($products as $v) {
             $sheet->setCellValueByColumnAndRow(0, $startRow, $v->sku);
             $sheet->setCellValueByColumnAndRow(1, $startRow, $v->name);
-            $sheet->setCellValueByColumnAndRow(2, $startRow, $v->item_category_name);
+            $sheet->setCellValueByColumnAndRow(2, $startRow, $v->type);
             $sheet->setCellValueByColumnAndRow(3, $startRow, $v->item_category_name);
-            $sheet->setCellValueByColumnAndRow(4, $startRow, $v->description);
-            $sheet->setCellValueByColumnAndRow(5, $startRow, $v->size);
-            $sheet->setCellValueByColumnAndRow(6, $startRow, $v->vendor_name);
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->vendor_uuid);
-            $sheet->setCellValueByColumnAndRow(8, $startRow, $v->price);
-            //$sheet->setCellValueByColumnAndRow(20, $startRow, $v->tax);
-            $sheet->setCellValueByColumnAndRow(10, $startRow, $v->quantity);
-            $sheet->setCellValueByColumnAndRow(11, $startRow, $v->contract_uuid);
-            $sheet->setCellValueByColumnAndRow(12, $startRow, date('Y-m-d', $v->from_date));
-            $sheet->setCellValueByColumnAndRow(13, $startRow, date('Y-m-d', $v->close_date));
-            $sheet->setCellValueByColumnAndRow(14, $startRow, date('Y-m-d', $v->claim_date));
-            //$sheet->setCellValueByColumnAndRow(15, $startRow, date('Y-m-d', $v->claim_date));
+            $sheet->setCellValueByColumnAndRow(4, $startRow, $v->size);
+            $sheet->setCellValueByColumnAndRow(5, $startRow, $v->price);
+            //$sheet->setCellValueByColumnAndRow(6, $startRow, $v->tax);
+            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->vendor_name);
+            $sheet->setCellValueByColumnAndRow(8, $startRow, $v->quantity);
+            $sheet->setCellValueByColumnAndRow(9, $startRow, $v->vendor_uuid);
+            $sheet->setCellValueByColumnAndRow(10, $startRow, $v->contract_uuid);
+            $sheet->setCellValueByColumnAndRow(11, $startRow, date('Y-m-d', $v->from_date));
+            $sheet->setCellValueByColumnAndRow(12, $startRow, date('Y-m-d', $v->close_date));
+            $sheet->setCellValueByColumnAndRow(13, $startRow, date('Y-m-d', $v->claim_date));
+            $sheet->setCellValueByColumnAndRow(14, $startRow, 'Yes');
+
             $startRow++;
         }
 

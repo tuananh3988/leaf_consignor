@@ -67,15 +67,15 @@ function leaf_consignor_menu()
         'file' => 'leaf_consignor_export.inc',
     );
 
-//    $items['admin/config/system/leaf/im'] = array(
-//        'title' => 'Leaf Import',
-//        'type' => MENU_LOCAL_TASK,
-//        'page callback' => 'drupal_get_form',
-//        'page arguments' => array('form_import_consignor_data'),
-//        'access arguments' => array('access_leaf_consignor_content'),
-//        'file' => 'leaf_consignor_export.inc',
-//
-//    );
+    $items['admin/config/system/leaf/import'] = array(
+        'title' => 'Leaf Import',
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('form_import_consignor_data'),
+        'access arguments' => array('access_leaf_consignor_content'),
+        'file' => 'leaf_consignor_export.inc',
+
+    );
     $items['vendor-detail/%ctools_js/%'] = array(
         'title' => 'The Happy Modal',
         'page arguments' => array(1, 2),

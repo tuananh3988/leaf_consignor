@@ -83,7 +83,6 @@ function form_export_consignor_data_submit($form, &$form_state) {
 //            $sheet->setCellValueByColumnAndRow(26, $startRow, implode(', ', $contractStr));
 //            $startRow++;
 //        }
-
         //export product
         $sheet = $xls->getActiveSheet();
         $products = db_select('leaf_product', 'p');
@@ -179,10 +178,38 @@ function form_import_consignor_data_submit($form, &$form_state) {
 
         $xls = $xls_reader->load($file->uri);
 
-        $sheet = $xls->setActiveSheetIndex(2);
+        $sheet = $xls->setActiveSheetIndex(0);
+        $k = 1;
+        foreach ($sheet->getRowIterator() as $k => $row) {
+            if ($k > 2) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $i = 1;
+                $v = [];
+                foreach ($cellIterator as $cell) {
+                    if (!is_null($cell)) {
+                        $v[$i] = $cell->getCalculatedValue();
+                    }
 
-        $a = $sheet->getCellByColumnAndRow(0,9)->getValue();
+                    $i++;
+                }
 
-        var_dump($a);die;
+                $product = db_select('leaf_product', 'p')
+                        ->fields('p')
+                        ->condition('p.sku', $v[1], '=')
+                        ->execute()
+                        ->fetchAssoc();
+                
+                
+                var_dump($product);
+            }
+
+            echo "<pre>";
+            var_dump($v);
+            $k++;
+        }
+
+
+        die;
     }
 }

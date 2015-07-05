@@ -192,6 +192,7 @@ function save_contract_products($form_state, $vendorId = null) {
                 'consignment_price' => $record['new_1423157549492'],
                 'purchase_price' => $record['new_1423157549494'],
                 'quantity' => $record['new_1423157549495'],
+                'remain_quantity' => $record['new_1423157549495'],
                 'status' => $record['new_1423157549496'],
             ];
 

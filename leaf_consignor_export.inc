@@ -180,7 +180,7 @@ function form_import_consignor_data_submit($form, &$form_state) {
 
         $sheet = $xls->setActiveSheetIndex(0);
         $k = 1;
-        foreach ($sheet->getRowIterator() as $k => $row) {
+        foreach ($sheet->getRowIterator() as $row) {
             if ($k > 2) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
@@ -198,18 +198,32 @@ function form_import_consignor_data_submit($form, &$form_state) {
                         ->fields('p')
                         ->condition('p.sku', $v[1], '=')
                         ->execute()
-                        ->fetchAssoc();
+                        ->fetchAllAssoc('product_id');
                 
-                
-                var_dump($product);
+                if(count($product) > 1) {
+                    watchdog('leaf_consignor', 'sku duplicated with sku id: %id', ['%id' => $v[1]], WATCHDOG_WARNING);
+                }
+                else {
+                    if(!empty($product)) {
+                        $product = array_values($product)[0];
+                        if($v[9] < $product->remain_quantity) {
+                            db_update('leaf_product')
+                            ->fields(array(
+                                'remain_quantity' => $v[9],
+                                'status' => 1,
+                            ))
+                            ->condition('product_id', $product->product_id, '=')
+                            ->execute();
+
+                            drupal_set_message('update product sku ' . $v[1]);
+                        }
+                    }
+                }
             }
 
-            echo "<pre>";
-            var_dump($v);
             $k++;
         }
-
-
-        die;
+        
+        drupal_set_message('Update success!');
     }
 }

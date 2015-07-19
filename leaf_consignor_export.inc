@@ -1,7 +1,6 @@
 <?php
 
 function form_export_consignor_data($form, &$form_state, $no_js_use = FALSE) {
-
     $form['xls'] = array(
         '#type' => 'fieldset',
         '#title' => t('Export xls.'),
@@ -23,105 +22,12 @@ function form_export_consignor_data_submit($form, &$form_state) {
     $v = $form_state['values'];
     if ($v['op'] == 'Export xls') {
         module_load_include('inc', 'phpexcel');
-
-
         $headers = array();
-        $options = [
-            'template' => drupal_get_path('module', 'leaf_consignor') . '/templates/excel/QB POS Import Template.xls',
-            'format' => 'xls',
-            'ignore_headers' => TRUE,
-        ];
 
-        $path = 'public://xls/';
-        if (!is_dir($path)) {
-            mkdir($path, 0777);
-        }
 
         $name = 'QB_POS_' . date('Ymd') . '.xls';
 
-        $path .= $name;
-
-        $library = libraries_load('PHPExcel');
-        $xls_reader = PHPExcel_IOFactory::createReaderForFile($options['template']);
-
-        $xls = $xls_reader->load($options['template']);
-
-        //export vendor
-//        $sheet = $xls->setActiveSheetIndex(2);
-//        $vendor = db_select('leaf_vendor', 'v');
-//        $vendor->leftJoin('leaf_payment', 'p', 'p.id = v.payment_id');
-//        $vendor->fields('v')
-//                ->addField('p', 'name', 'pname');
-//        $vendor = $vendor->execute()
-//                ->fetchAll();
-//
-//        $startRow = 9;
-//
-//        foreach ($vendor as $v) {
-//            $contracts = db_select('leaf_contract', 'c')
-//                    ->fields('c')
-//                    ->condition('vendor_id', $v->vendor_id, '=')
-//                    ->execute()
-//                    ->fetchAll();
-//
-//            $contractStr = [];
-//            foreach ($contracts as $c) {
-//                $contractStr[] = $c->contract_uuid;
-//            }
-//
-//            $sheet->setCellValueByColumnAndRow(0, $startRow, $v->name);
-//            $sheet->setCellValueByColumnAndRow(4, $startRow, $v->address);
-//            $sheet->setCellValueByColumnAndRow(5, $startRow, $v->city);
-//            $sheet->setCellValueByColumnAndRow(6, $startRow, $v->state);
-//            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->zip);
-//            $sheet->setCellValueByColumnAndRow(8, $startRow, $v->phone_number);
-//            $sheet->setCellValueByColumnAndRow(9, $startRow, $v->alternate_phone_number);
-//            $sheet->setCellValueByColumnAndRow(12, $startRow, $v->vendor_uuid);
-//            $sheet->setCellValueByColumnAndRow(13, $startRow, $v->vendor_uuid);
-//            $sheet->setCellValueByColumnAndRow(17, $startRow, $v->email_address);
-//            $sheet->setCellValueByColumnAndRow(19, $startRow, $v->pname);
-//            $sheet->setCellValueByColumnAndRow(26, $startRow, implode(', ', $contractStr));
-//            $startRow++;
-//        }
-        //export product
-        $sheet = $xls->getActiveSheet();
-        $products = db_select('leaf_product', 'p');
-        $products->leftJoin('leaf_contract', 'c', 'c.contract_id = p.contract_id');
-        $products->leftJoin('leaf_vendor', 'v', 'v.vendor_id = c.vendor_id');
-        $products->leftJoin('leaf_item_category', 'ic', 'ic.id = p.item_category_id');
-        $products->fields('p')
-                ->fields('c', ['contract_uuid', 'from_date', 'close_date', 'claim_date']);
-        $products->addField('v', 'name', 'vendor_name');
-        $products->addField('v', 'vendor_uuid', 'vendor_uuid');
-        $products->addField('ic', 'name', 'item_category_name');
-        $products->addField('ic', 'type', 'type');
-        $products = $products->execute()
-                ->fetchAll();
-
-        $startRow = 3;
-
-        foreach ($products as $v) {
-            $sheet->setCellValueByColumnAndRow(0, $startRow, $v->sku);
-            $sheet->setCellValueByColumnAndRow(1, $startRow, $v->name);
-            $sheet->setCellValueByColumnAndRow(2, $startRow, $v->type);
-            $sheet->setCellValueByColumnAndRow(3, $startRow, $v->item_category_name);
-            $sheet->setCellValueByColumnAndRow(4, $startRow, $v->size);
-            $sheet->setCellValueByColumnAndRow(5, $startRow, $v->price);
-            //$sheet->setCellValueByColumnAndRow(6, $startRow, $v->tax);
-            $sheet->setCellValueByColumnAndRow(7, $startRow, $v->vendor_name);
-            $sheet->setCellValueByColumnAndRow(8, $startRow, $v->quantity);
-            $sheet->setCellValueByColumnAndRow(9, $startRow, $v->vendor_uuid);
-            $sheet->setCellValueByColumnAndRow(10, $startRow, $v->contract_uuid);
-            $sheet->setCellValueByColumnAndRow(11, $startRow, date('Y-m-d', $v->from_date));
-            $sheet->setCellValueByColumnAndRow(12, $startRow, date('Y-m-d', $v->close_date));
-            $sheet->setCellValueByColumnAndRow(13, $startRow, date('Y-m-d', $v->claim_date));
-            $sheet->setCellValueByColumnAndRow(14, $startRow, 'Yes');
-
-            $startRow++;
-        }
-
-        $writer = new PHPExcel_Writer_Excel5($xls);
-        $writer->save($path);
+        $path = export_consignor_data($name);
 
         $http_headers = array(
             'Content-Type' => 'text/csv',
@@ -138,6 +44,65 @@ function form_export_consignor_data_submit($form, &$form_state) {
 
         file_transfer($path, $http_headers);
     }
+}
+
+function export_consignor_data($name) {
+    $path = 'public://xls/';
+    if (!is_dir($path)) {
+        mkdir($path, 0777);
+    }
+
+    $options = [
+        'template' => drupal_get_path('module', 'leaf_consignor') . '/templates/excel/QB POS Import Template.xls',
+        'format' => 'xls',
+        'ignore_headers' => TRUE,
+    ];
+
+    $path .= $name;
+    $library = libraries_load('PHPExcel');
+    $xls_reader = PHPExcel_IOFactory::createReaderForFile($options['template']);
+    $xls = $xls_reader->load($options['template']);
+    //export product
+    $sheet = $xls->getActiveSheet();
+    $products = db_select('leaf_product', 'p');
+    $products->leftJoin('leaf_contract', 'c', 'c.contract_id = p.contract_id');
+    $products->leftJoin('leaf_vendor', 'v', 'v.vendor_id = c.vendor_id');
+    $products->leftJoin('leaf_item_category', 'ic', 'ic.id = p.item_category_id');
+    $products->fields('p')
+            ->fields('c', ['contract_uuid', 'from_date', 'close_date', 'claim_date']);
+    $products->addField('v', 'name', 'vendor_name');
+    $products->addField('v', 'vendor_uuid', 'vendor_uuid');
+    $products->addField('ic', 'name', 'item_category_name');
+    $products->addField('ic', 'type', 'type');
+    $products = $products->execute()
+            ->fetchAll();
+
+    $startRow = 3;
+
+    foreach ($products as $v) {
+        $sheet->setCellValueByColumnAndRow(0, $startRow, $v->sku);
+        $sheet->setCellValueByColumnAndRow(1, $startRow, $v->name);
+        $sheet->setCellValueByColumnAndRow(2, $startRow, $v->type);
+        $sheet->setCellValueByColumnAndRow(3, $startRow, $v->item_category_name);
+        $sheet->setCellValueByColumnAndRow(4, $startRow, $v->size);
+        $sheet->setCellValueByColumnAndRow(5, $startRow, $v->price);
+        //$sheet->setCellValueByColumnAndRow(6, $startRow, $v->tax);
+        $sheet->setCellValueByColumnAndRow(7, $startRow, $v->vendor_name);
+        $sheet->setCellValueByColumnAndRow(8, $startRow, $v->quantity);
+        $sheet->setCellValueByColumnAndRow(9, $startRow, $v->vendor_uuid);
+        $sheet->setCellValueByColumnAndRow(10, $startRow, $v->contract_uuid);
+        $sheet->setCellValueByColumnAndRow(11, $startRow, date('Y-m-d', $v->from_date));
+        $sheet->setCellValueByColumnAndRow(12, $startRow, date('Y-m-d', $v->close_date));
+        $sheet->setCellValueByColumnAndRow(13, $startRow, date('Y-m-d', $v->claim_date));
+        $sheet->setCellValueByColumnAndRow(14, $startRow, 'Yes');
+
+        $startRow++;
+    }
+
+    $writer = new PHPExcel_Writer_Excel5($xls);
+    $writer->save($path);
+
+    return $path;
 }
 
 function form_import_consignor_data($form, &$form_state, $no_js_use = FALSE) {
@@ -199,21 +164,20 @@ function form_import_consignor_data_submit($form, &$form_state) {
                         ->condition('p.sku', $v[1], '=')
                         ->execute()
                         ->fetchAllAssoc('product_id');
-                
-                if(count($product) > 1) {
+
+                if (count($product) > 1) {
                     watchdog('leaf_consignor', 'sku duplicated with sku id: %id', ['%id' => $v[1]], WATCHDOG_WARNING);
-                }
-                else {
-                    if(!empty($product)) {
+                } else {
+                    if (!empty($product)) {
                         $product = array_values($product)[0];
-                        if($v[9] < $product->remain_quantity) {
+                        if ($v[9] < $product->remain_quantity) {
                             db_update('leaf_product')
-                            ->fields(array(
-                                'remain_quantity' => $v[9],
-                                'status' => 1,
-                            ))
-                            ->condition('product_id', $product->product_id, '=')
-                            ->execute();
+                                    ->fields(array(
+                                        'remain_quantity' => $v[9],
+                                        'status' => 1,
+                                    ))
+                                    ->condition('product_id', $product->product_id, '=')
+                                    ->execute();
 
                             drupal_set_message('update product sku ' . $v[1]);
                         }
@@ -223,7 +187,7 @@ function form_import_consignor_data_submit($form, &$form_state) {
 
             $k++;
         }
-        
+
         drupal_set_message('Update success!');
     }
 }

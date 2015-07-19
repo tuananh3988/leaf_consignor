@@ -89,6 +89,16 @@ function leaf_consignor_menu()
         'weight' => '-2',
         'type' => MENU_DEFAULT_LOCAL_TASK,
     );
+    
+    $items['admin/config/system/dropbox'] = array(
+        'title' => 'Intergrate dropbox',
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('form_intergrate_dropbox'),
+        'access arguments' => array('access_leaf_consignor_content'),
+        'file' => 'leaf_consignor_dropbox.inc',
+
+    );
 
     return $items;
 }
@@ -208,6 +218,16 @@ function leaf_consignor_cron()
     processSendMailClaimDate();
     //today is claim date
     processSendMailClaimDate(FALSE);
+    //upload dropbox
+    exportConsignorDataToDropbox();
+}
+
+function exportConsignorDataToDropbox() {
+    module_load_include('inc', 'leaf_consignor', 'leaf_consignor_export');
+    module_load_include('inc', 'leaf_consignor', 'leaf_consignor_dropbox');
+    $name = date('Ymd') . '-export.xls';
+    $path = export_consignor_data($name);
+    uploadToDropbox($path);
 }
 
 function processSendMailClaimDate($today = TRUE)

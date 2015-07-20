@@ -1,11 +1,10 @@
 <?php
 
 include_once DRUPAL_ROOT . '/sites/all/libraries/dropbox-sdk/Dropbox/autoload.php';
-
 use \Dropbox as dbx;
 
 function form_intergrate_dropbox($form, &$form_state, $no_js_use = FALSE) {
-    $appInfo = dbx\AppInfo::loadFromJsonFile(DRUPAL_ROOT . "/sites/all/libraries/dropbox-sdk/config.json");
+    $appInfo = dbx\AppInfo::loadFromJsonFile(drupal_get_path('module', 'leaf_consignor') . "/config/config.json");
     $webAuth = new dbx\WebAuthNoRedirect($appInfo, "PHP-Example/1.0");
 
     $authorizeUrl = $webAuth->start();

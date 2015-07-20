@@ -1,6 +1,7 @@
 <?php
 
 include_once DRUPAL_ROOT . '/sites/all/libraries/dropbox-sdk/Dropbox/autoload.php';
+
 use \Dropbox as dbx;
 
 function form_intergrate_dropbox($form, &$form_state, $no_js_use = FALSE) {
@@ -52,31 +53,49 @@ function form_intergrate_dropbox_submit($form, &$form_state) {
         $message = $exc->getMessage();
     }
 
-    if(empty($message)) {
+    if (empty($message)) {
         variable_set('leaf_dropbox_access_token', $accessToken);
         drupal_set_message('Update successfully!');
-    }
-    else {
+    } else {
         $message = json_decode($message);
         drupal_set_message($message->error_description, 'warning');
     }
-
 }
 
 function uploadToDropbox($path) {
     $accessToken = variable_get('leaf_dropbox_access_token', '');
-    
-    if(empty($accessToken)) {
+
+    if (empty($accessToken)) {
         //log
         watchdog('leaf_consignor', 'Authorization code dont setup!', [], WATCHDOG_WARNING);
-    }
-    else {
+    } else {
         $dbxClient = new dbx\Client($accessToken, "PHP-Example/1.0");
         $f = fopen($path, "rb");
         $folder = '/leaf export' . date('/Y/m');
         $dbxClient->createFolder($folder);
         $name = $folder . '/' . date('Ymd') . '-leaf-export.xls';
-        $result = $dbxClient->uploadFile($name, dbx\WriteMode::add(), $f);
+        $result = $dbxClient->uploadFile($name, dbx\WriteMode::force(), $f);
+    }
+}
+
+function downloadFromDropbox() {
+    $accessToken = variable_get('leaf_dropbox_access_token', '');
+    $file = NULL;
+    if (empty($accessToken)) {
+        //log
+        watchdog('leaf_consignor', 'Authorization code dont setup!', [], WATCHDOG_WARNING);
+    } else {
+        $dbxClient = new dbx\Client($accessToken, "PHP-Example/1.0");
+        $folder = '/POS' . date('/Y/m');
+        $dbxClient->createFolder($folder);
+        $name = date('Ymd', strtotime("yesterday")) . '-POS.xls';
+        $f = fopen($name, "w+b");
+        $fileMetadata = $dbxClient->getFile($folder . '/' . $name, $f);
+        $f = file_get_contents($name);
+        $file = file_save_data($f, 'public://' . $name);
+        $file->status = FILE_STATUS_PERMANENT;
+        file_save($file);
     }
     
+    return $file;
 }

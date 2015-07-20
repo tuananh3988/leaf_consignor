@@ -88,7 +88,7 @@ function export_consignor_data($name) {
         $sheet->setCellValueByColumnAndRow(5, $startRow, $v->price);
         //$sheet->setCellValueByColumnAndRow(6, $startRow, $v->tax);
         $sheet->setCellValueByColumnAndRow(7, $startRow, $v->vendor_name);
-        $sheet->setCellValueByColumnAndRow(8, $startRow, $v->quantity);
+        $sheet->setCellValueByColumnAndRow(8, $startRow, $v->remain_quantity);
         $sheet->setCellValueByColumnAndRow(9, $startRow, $v->vendor_uuid);
         $sheet->setCellValueByColumnAndRow(10, $startRow, $v->contract_uuid);
         $sheet->setCellValueByColumnAndRow(11, $startRow, date('Y-m-d', $v->from_date));
@@ -138,56 +138,60 @@ function form_import_consignor_data($form, &$form_state, $no_js_use = FALSE) {
 function form_import_consignor_data_submit($form, &$form_state) {
     if (isset($form_state['values']['upload'])) {
         $file = file_load($form_state['values']['upload']);
-        $library = libraries_load('PHPExcel');
-        $xls_reader = PHPExcel_IOFactory::createReaderForFile($file->uri);
+        import_consignor_data($file);
+    }
+}
 
-        $xls = $xls_reader->load($file->uri);
+function import_consignor_data($file) {
+    $library = libraries_load('PHPExcel');
+    $xls_reader = PHPExcel_IOFactory::createReaderForFile($file->uri);
 
-        $sheet = $xls->setActiveSheetIndex(0);
-        $k = 1;
-        foreach ($sheet->getRowIterator() as $row) {
-            if ($k > 2) {
-                $cellIterator = $row->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(false);
-                $i = 1;
-                $v = [];
-                foreach ($cellIterator as $cell) {
-                    if (!is_null($cell)) {
-                        $v[$i] = $cell->getCalculatedValue();
-                    }
+    $xls = $xls_reader->load($file->uri);
 
-                    $i++;
+    $sheet = $xls->setActiveSheetIndex(0);
+    $k = 1;
+    foreach ($sheet->getRowIterator() as $row) {
+        if ($k > 2) {
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+            $i = 1;
+            $v = [];
+            foreach ($cellIterator as $cell) {
+                if (!is_null($cell)) {
+                    $v[$i] = $cell->getCalculatedValue();
                 }
 
-                $product = db_select('leaf_product', 'p')
-                        ->fields('p')
-                        ->condition('p.sku', $v[1], '=')
-                        ->execute()
-                        ->fetchAllAssoc('product_id');
+                $i++;
+            }
+            
+            $product = db_select('leaf_product', 'p')
+                    ->fields('p')
+                    ->condition('p.sku', $v[1], '=')
+                    ->execute()
+                    ->fetchAllAssoc('product_id');
 
-                if (count($product) > 1) {
-                    watchdog('leaf_consignor', 'sku duplicated with sku id: %id', ['%id' => $v[1]], WATCHDOG_WARNING);
-                } else {
-                    if (!empty($product)) {
-                        $product = array_values($product)[0];
-                        if ($v[9] < $product->remain_quantity) {
-                            db_update('leaf_product')
-                                    ->fields(array(
-                                        'remain_quantity' => $v[9],
-                                        'status' => 1,
-                                    ))
-                                    ->condition('product_id', $product->product_id, '=')
-                                    ->execute();
+            if (count($product) > 1) {
+                watchdog('leaf_consignor', 'sku duplicated with sku id: %id', ['%id' => $v[1]], WATCHDOG_WARNING);
+            } else {
+                if (!empty($product)) {
+                    $product = array_values($product)[0];
+                    if ($v[9] < $product->remain_quantity) {
+                        db_update('leaf_product')
+                                ->fields(array(
+                                    'remain_quantity' => $v[9],
+                                    'status' => 1,
+                                ))
+                                ->condition('product_id', $product->product_id, '=')
+                                ->execute();
 
-                            drupal_set_message('update product sku ' . $v[1]);
-                        }
+                        drupal_set_message('update product sku ' . $v[1]);
                     }
                 }
             }
-
-            $k++;
         }
 
-        drupal_set_message('Update success!');
+        $k++;
     }
+    
+    drupal_set_message('Update success!');
 }
